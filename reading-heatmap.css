@@ -26,114 +26,158 @@ p#total-books {
     border-radius: 12px;
     padding: 24px;
     background: #fff;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+#heatmap-legend {
+    width: 100%;
+}
+
+.reading-layout {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.heatmap-column {
+    flex: 1 1 420px;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
 }
 
 .heatmap-grid {
     display: flex;
     flex-direction: column;
     gap: 12px;
-}
-
-.heatmap-year-row,
-.year-totals-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-}
-
-.month-labels,
-.row-spacer {
-    width: 70px;
-    flex-shrink: 0;
-}
-
-.month-labels {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.month-labels div {
-    height: 18px;
-    display: flex;
     align-items: center;
-    justify-content: flex-end;
+}
+
+.heatmap-months-top {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.corner-spacer {
+    width: 70px;
+    height: 18px;
+    margin-right: 12px;
+}
+
+.total-spacer {
+    width: 60px;
+    height: 18px;
+    margin-left: 12px;
+}
+
+.month-label-top {
+    width: 20px;
     font-size: 11px;
     color: #586069;
-    gap: 4px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
 }
 
 .season-emoji {
     font-size: 12px;
     line-height: 1;
-    margin-right: auto;
-    width: 40px;
-    text-align: right;
 }
 
-.heatmap-year-row .year-label {
-    width: 18px;
-    font-size: 12px;
-    color: #586069;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform: rotate(-90deg);
-    transform-origin: center;
-    white-space: nowrap;
-}
-
-.heatmap-columns {
-    display: flex;
-    gap: 6px;
-}
-
-.heatmap-column {
+.heatmap-body {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    align-items: center;
+}
+
+.heatmap-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+}
+
+.heatmap-row .year-label {
+    width: 70px;
+    font-size: 12px;
+    color: #586069;
+    text-align: right;
+    font-weight: 500;
+    margin-right: 12px;
 }
 
 .heatmap-cell {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 3px;
-    background: #ebedf0;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
     transition: transform 0.15s ease;
     position: relative;
 }
 
-.heatmap-cell.level-1 { background: #9be9a8; }
-.heatmap-cell.level-2 { background: #40c463; }
-.heatmap-cell.level-3 { background: #30a14e; }
-.heatmap-cell.level-4 { background: #216e39; }
+.heatmap-cell.level-1 { background: #cfe7ff; border-color: transparent; }
+.heatmap-cell.level-2 { background: #80b9ff; border-color: transparent; }
+.heatmap-cell.level-3 { background: #2f7fff; border-color: transparent; }
+.heatmap-cell.level-4 { background: #0f4da8; border-color: transparent; }
 
 .heatmap-cell:hover {
     transform: translateY(-2px);
 }
 
 .year-total {
-    width: 18px;
+    width: 36px;
     color: #586069;
-    text-align: center;
+    text-align: right;
     font-size: 12px;
+    margin-left: 6px;
 }
 
-.books-columns {
+.heatmap-legend {
     display: flex;
-    flex-wrap: wrap;
-    gap: 32px;
-    margin-top: 32px;
+    justify-content: center;
+    gap: 12px;
+    align-items: center;
+    font-size: 12px;
+    color: #586069;
 }
+
+.heatmap-legend-item {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.heatmap-legend-square {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: #e3efff;
+}
+
+.heatmap-legend-square.level-1 { background: #b3d4ff; }
+.heatmap-legend-square.level-2 { background: #6ba7ff; }
+.heatmap-legend-square.level-3 { background: #2f7fff; }
+.heatmap-legend-square.level-4 { background: #0f4da8; }
 
 .books-column {
-    flex: 1;
-    min-width: 260px;
+    flex: 1 1 280px;
+    min-width: 240px;
     background: #fff;
     border: 1px solid #e1e4e8;
     border-radius: 12px;
     padding: 20px;
+    min-height: 200px;
 }
 
 .books-column h2 {
@@ -188,13 +232,18 @@ p#total-books {
         padding: 16px;
     }
 
+    .reading-layout {
+        flex-direction: column;
+    }
+
+    .heatmap-column,
+    .books-column {
+        max-width: none;
+        width: 100%;
+    }
+
     .heatmap-cell {
         width: 16px;
         height: 16px;
-    }
-
-    .heatmap-year-row .year-label,
-    .year-total {
-        width: 16px;
     }
 }

@@ -2,7 +2,9 @@
 const dom = {
     total: document.getElementById('total-books'),
     heatmap: document.getElementById('reading-heatmap'),
-    list: document.getElementById('books-list')
+    legend: document.getElementById('heatmap-legend'),
+    currentList: document.getElementById('current-books'),
+    pastList: document.getElementById('past-books')
 };
 
 const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
@@ -87,47 +89,27 @@ function renderHeatmap() {
     const yearsWithData = Array.from(state.booksByYear.keys()).sort((a, b) => a - b);
     const currentYear = new Date().getFullYear();
     const minYear = Math.min(...yearsWithData, currentYear);
-    const maxYear = Math.max(...yearsWithData, currentYear);
-    const now = new Date();
-
     const years = [];
-    for (let year = minYear; year <= maxYear; year++) {
+    for (let year = currentYear; year >= minYear; year--) {
         years.push(year);
     }
 
     const wrapper = document.createElement('div');
     wrapper.className = 'heatmap-grid';
+    wrapper.appendChild(buildMonthHeader());
 
-    const yearRow = document.createElement('div');
-    yearRow.className = 'heatmap-year-row';
-    const topSpacer = document.createElement('div');
-    topSpacer.className = 'row-spacer';
-    yearRow.appendChild(topSpacer);
-    years.forEach(year => {
-        const label = document.createElement('div');
-        label.className = 'year-label';
-        label.textContent = year;
-        yearRow.appendChild(label);
-    });
-
-    const columnsWrapper = document.createElement('div');
-    columnsWrapper.className = 'heatmap-columns';
-
-    const monthLabels = document.createElement('div');
-    monthLabels.className = 'month-labels';
-    monthNames.forEach((name, index) => {
-        const label = document.createElement('div');
-        const monthNumber = index + 1;
-        const emoji = seasonEmojis[monthNumber];
-        label.innerHTML = emoji ? `<span class="season-emoji" aria-hidden="true">${emoji}</span>${name}` : name;
-        label.setAttribute('data-month', monthNumber);
-        monthLabels.appendChild(label);
-    });
-    columnsWrapper.appendChild(monthLabels);
+    const body = document.createElement('div');
+    body.className = 'heatmap-body';
+    const now = new Date();
 
     years.forEach(year => {
-        const column = document.createElement('div');
-        column.className = 'heatmap-column';
+        const row = document.createElement('div');
+        row.className = 'heatmap-row';
+
+        const yearLabel = document.createElement('div');
+        yearLabel.className = 'year-label';
+        yearLabel.textContent = year;
+        row.appendChild(yearLabel);
 
         for (let month = 1; month <= 12; month++) {
             const cell = document.createElement('div');
@@ -147,57 +129,49 @@ function renderHeatmap() {
                 cell.title = `${year}년 ${month}월: ${count}권`;
             }
 
-            column.appendChild(cell);
+            row.appendChild(cell);
         }
 
-        columnsWrapper.appendChild(column);
-    });
-
-    const totalsRow = document.createElement('div');
-    totalsRow.className = 'year-totals-row';
-    const bottomSpacer = document.createElement('div');
-    bottomSpacer.className = 'row-spacer';
-    totalsRow.appendChild(bottomSpacer);
-
-    years.forEach(year => {
         const totalCell = document.createElement('div');
         totalCell.className = 'year-total';
         const total = state.booksByYear.get(year)?.length ?? 0;
-        if (total) {
-            totalCell.textContent = total;
-        }
-        totalsRow.appendChild(totalCell);
+        if (total) totalCell.textContent = `${total}권`;
+        row.appendChild(totalCell);
+
+        body.appendChild(row);
     });
 
-    wrapper.appendChild(yearRow);
-    wrapper.appendChild(columnsWrapper);
-    wrapper.appendChild(totalsRow);
+    wrapper.appendChild(body);
     dom.heatmap.appendChild(wrapper);
+    dom.legend.innerHTML = '';
+    dom.legend.appendChild(createLegend());
 }
 
 function renderBookColumns() {
-    dom.list.innerHTML = '';
-    if (state.books.length === 0) return;
+    dom.currentList.innerHTML = '';
+    dom.pastList.innerHTML = '';
+    if (state.books.length === 0) {
+        dom.currentList.textContent = '표시할 책이 없어요.';
+        dom.pastList.textContent = '';
+        return;
+    }
 
     const currentYear = new Date().getFullYear();
-    const currentColumn = createColumn();
-    const pastColumn = createColumn();
 
     Array.from(state.booksByYear.keys())
         .sort((a, b) => b - a)
         .forEach(year => {
-            const target = year === currentYear ? currentColumn : pastColumn;
+            const target = year === currentYear ? dom.currentList : dom.pastList;
             target.appendChild(createYearSection(year, year === currentYear));
         });
 
-    if (currentColumn.childElementCount) dom.list.appendChild(currentColumn);
-    if (pastColumn.childElementCount) dom.list.appendChild(pastColumn);
-}
+    if (!dom.currentList.childElementCount) {
+        dom.currentList.textContent = '올해 데이터가 없어요.';
+    }
 
-function createColumn() {
-    const column = document.createElement('div');
-    column.className = 'books-column';
-    return column;
+    if (!dom.pastList.childElementCount) {
+        dom.pastList.textContent = '이전 연도 데이터가 없어요.';
+    }
 }
 
 function createYearSection(year, isCurrentYear) {
@@ -231,6 +205,69 @@ function monthKey(year, month) {
 
 function getBooksForMonth(year, month) {
     return state.heatmapBuckets.get(monthKey(year, month)) || [];
+}
+
+function createLegend() {
+    const legend = document.createElement('div');
+    legend.className = 'heatmap-legend';
+    const items = [
+        { label: '1권', level: 1 },
+        { label: '2권', level: 2 },
+        { label: '3권', level: 3 },
+        { label: '4권 이상', level: 4 }
+    ];
+
+    const title = document.createElement('span');
+    title.textContent = 'Legend:';
+    legend.appendChild(title);
+
+    items.forEach(item => {
+        const wrapper = document.createElement('span');
+        wrapper.className = 'heatmap-legend-item';
+
+        const square = document.createElement('span');
+        square.className = `heatmap-legend-square level-${item.level}`;
+
+        const text = document.createElement('span');
+        text.textContent = item.label;
+
+        wrapper.appendChild(square);
+        wrapper.appendChild(text);
+        legend.appendChild(wrapper);
+    });
+
+    return legend;
+}
+
+function buildMonthHeader() {
+    const header = document.createElement('div');
+    header.className = 'heatmap-months-top';
+
+    const corner = document.createElement('div');
+    corner.className = 'corner-spacer';
+    header.appendChild(corner);
+
+    for (let month = 1; month <= 12; month++) {
+        const label = document.createElement('div');
+        label.className = 'month-label-top';
+        const emoji = seasonEmojis[month];
+        if (emoji) {
+            const emojiSpan = document.createElement('span');
+            emojiSpan.className = 'season-emoji';
+            emojiSpan.textContent = emoji;
+            emojiSpan.setAttribute('aria-hidden', 'true');
+            label.appendChild(emojiSpan);
+        }
+        const textSpan = document.createElement('span');
+        textSpan.textContent = `${month}월`;
+        label.appendChild(textSpan);
+        header.appendChild(label);
+    }
+
+    const tail = document.createElement('div');
+    tail.className = 'total-spacer';
+    header.appendChild(tail);
+    return header;
 }
 
 function showBookList(cell, books, year, monthLabel) {

@@ -10,8 +10,14 @@
     <main>
         <h1>독서 히트맵</h1>
         <p id="total-books">데이터를 불러오는 중...</p>
-        <div id="reading-heatmap"></div>
-        <section class="books-columns" id="books-list"></section>
+        <div class="reading-layout">
+            <div class="heatmap-column">
+                <div id="reading-heatmap"></div>
+                <div id="heatmap-legend"></div>
+            </div>
+            <section class="books-column" id="current-books"></section>
+            <section class="books-column" id="past-books"></section>
+        </div>
     </main>
 
     <script src="reading-heatmap.js" defer></script>
