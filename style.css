@@ -23,8 +23,6 @@ p#total-books {
 
 #reading-heatmap {
     border-radius: 12px;
-    padding: 24px;
-    background: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -63,15 +61,6 @@ p#total-books {
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: center;
-}
-
-.heatmap-column {
-    flex: 1 1 420px;
-    max-width: 520px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
 }
 
 .heatmap-grid {
@@ -170,11 +159,10 @@ p#total-books {
 .heatmap-legend-square.level-3 { background: #2f7fff; }
 .heatmap-legend-square.level-4 { background: #0f4da8; }
 
-.books-column,
-.heatmap-column {
-    flex: 1;
-    min-width: 240px;
-    max-width: 320px;
+.column-card {
+    flex: 1 1 360px;
+    min-width: 300px;
+    max-width: 420px;
     background: #fff;
     border: 1px solid #e1e4e8;
     border-radius: 12px;
@@ -187,6 +175,12 @@ p#total-books {
     flex-direction: column;
     gap: 12px;
     align-items: center;
+}
+
+.books-column {
+    flex: 1 1 320px;
+    min-width: 280px;
+    max-width: 360px;
 }
 
 .books-column h2 {
@@ -262,7 +256,7 @@ p#total-books {
     margin: 4px 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1300px) {
     body {
         padding: 16px;
     }
@@ -272,8 +266,7 @@ p#total-books {
         gap: 8px;
     }
 
-    .heatmap-column,
-    .books-column {
+    .column-card {
         flex: 0 0 100%;
         max-width: 360px;
         width: 100%;
