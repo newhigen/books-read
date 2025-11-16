@@ -261,12 +261,19 @@ p#total-books {
 
     .reading-layout {
         flex-direction: column;
+        gap: 12px;
     }
 
     .heatmap-column,
     .books-column {
+        flex: 1 1 auto;
         max-width: none;
         width: 100%;
+        min-width: 0;
+    }
+
+    #reading-heatmap {
+        margin-bottom: 6px;
     }
 
     .heatmap-cell {
