@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독서 히트맵</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: #f6f8fa;
+            color: #24292e;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        p#total-books {
+            margin-top: 0;
+            margin-bottom: 24px;
+            color: #586069;
+        }
+
+        #reading-heatmap {
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 24px;
+            background: #fff;
+        }
+
+        .year-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .heatmap-row {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .heatmap-cell {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            background: #ebedf0;
+            transition: transform 0.15s ease;
+            position: relative;
+        }
+
+        .heatmap-cell.level-1 { background: #9be9a8; }
+        .heatmap-cell.level-2 { background: #40c463; }
+        .heatmap-cell.level-3 { background: #30a14e; }
+        .heatmap-cell.level-4 { background: #216e39; }
+
+        .heatmap-cell:hover {
+            transform: translateY(-2px);
+        }
+
+        .books-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            margin-top: 32px;
+        }
+
+        .books-column {
+            flex: 1;
+            min-width: 260px;
+            background: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .books-column h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .books-column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .books-column li {
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: flex;
+            gap: 12px;
+        }
+
+        .books-column li span.month {
+            min-width: 40px;
+            color: #6a737d;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .book-tooltip {
+            position: fixed;
+            background: #24292e;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            max-width: 240px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+
+        .book-tooltip .tooltip-header {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .book-tooltip .tooltip-book {
+            margin: 4px 0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .heatmap-cell {
+                width: 14px;
+                height: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>독서 히트맵</h1>
+        <p id="total-books">데이터를 불러오는 중...</p>
+        <div id="reading-heatmap"></div>
+        <section class="books-columns" id="books-list"></section>
+    </main>
+
+    <script>
+        let booksList = [];
+        let readingData = {};
+        const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            const headers = lines[0].split(',');
+            const result = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const values = lines[i].split(',');
+                const entry = {};
+
+                headers.forEach((header, index) => {
+                    let value = values[index] || '';
+                    if (value.startsWith('"') && value.endsWith('"')) {
+                        value = value.slice(1, -1);
+                    }
+                    if (header === 'year' || header === 'month') {
+                        entry[header] = parseInt(value, 10) || 0;
+                    } else {
+                        entry[header] = value.trim();
+                    }
+                });
+
+                if (entry.title && entry.year && entry.month) {
+                    result.push(entry);
+                }
+            }
+
+            return result;
+        }
+
+        async function loadBooksData() {
+            try {
+                const response = await fetch('books.csv');
+                const csvText = await response.text();
+                booksList = parseCSV(csvText);
+                booksList.sort((a, b) => {
+                    if (a.year !== b.year) return b.year - a.year;
+                    if (a.month !== b.month) return b.month - a.month;
+                    return a.title.localeCompare(b.title);
+                });
+
+                generateHeatmapData();
+                createHeatmap();
+                generateBooksList();
+                updateTotalBooks();
+            } catch (error) {
+                console.error('CSV를 불러오는 중 문제가 발생했습니다.', error);
+                document.getElementById('total-books').textContent = '데이터를 불러오지 못했어요.';
+            }
+        }
+
+        function generateHeatmapData() {
+            readingData = {};
+            booksList.forEach(book => {
+                const key = `${book.year}-${book.month.toString().padStart(2, '0')}`;
+                readingData[key] = (readingData[key] || 0) + 1;
+            });
+        }
+
+        function createHeatmap() {
+            const container = document.getElementById('reading-heatmap');
+            container.innerHTML = '';
+
+            if (booksList.length === 0) {
+                container.textContent = '표시할 데이터가 없어요.';
+                return;
+            }
+
+            const years = Array.from(new Set(booksList.map(book => book.year)));
+            years.sort((a, b) => b - a);
+            const minYear = Math.min(...years);
+            const currentYear = new Date().getFullYear();
+
+            const wrapper = document.createElement('div');
+            wrapper.style.cssText = 'display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;justify-content:center;';
+
+            const yearLabels = document.createElement('div');
+            yearLabels.className = 'year-labels';
+
+            for (let year = currentYear; year >= minYear; year--) {
+                const label = document.createElement('div');
+                label.style.cssText = 'height:16px;display:flex;align-items:center;justify-content:flex-end;font-size:12px;color:#586069;';
+                label.textContent = year;
+                yearLabels.appendChild(label);
+            }
+
+            const rows = document.createElement('div');
+            rows.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+
+            const now = new Date();
+            const nowYear = now.getFullYear();
+            const nowMonth = now.getMonth() + 1;
+
+            for (let year = currentYear; year >= minYear; year--) {
+                const row = document.createElement('div');
+                row.className = 'heatmap-row';
+
+                for (let month = 1; month <= 12; month++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'heatmap-cell';
+
+                    const isFuture = year > nowYear || (year === nowYear && month > nowMonth);
+                    if (isFuture) {
+                        cell.style.visibility = 'hidden';
+                    } else {
+                        const key = `${year}-${month.toString().padStart(2, '0')}`;
+                        const count = readingData[key] || 0;
+                        if (count > 0) {
+                            let level = 1;
+                            if (count === 1) level = 1;
+                            else if (count === 2) level = 2;
+                            else if (count === 3) level = 3;
+                            else level = 4;
+                            cell.classList.add(`level-${level}`);
+
+                            const booksInMonth = booksList.filter(book => book.year === year && book.month === month);
+                            cell.addEventListener('mouseenter', () => showBookList(cell, booksInMonth, year, monthNames[month - 1]));
+                            cell.addEventListener('mouseleave', hideBookList);
+                            cell.title = `${year}년 ${month}월: ${count}권`;
+                        } else {
+                            cell.title = `${year}년 ${month}월: 0권`;
+                        }
+                    }
+
+                    row.appendChild(cell);
+                }
+
+                const yearCount = document.createElement('div');
+                yearCount.style.cssText = 'font-size:12px;color:#586069;min-width:40px;text-align:right;';
+                const total = booksList.filter(book => book.year === year).length;
+                yearCount.textContent = total ? `${total}권` : '';
+                row.appendChild(yearCount);
+
+                rows.appendChild(row);
+            }
+
+            wrapper.appendChild(yearLabels);
+            wrapper.appendChild(rows);
+            container.appendChild(wrapper);
+        }
+
+        function generateBooksList() {
+            const container = document.getElementById('books-list');
+            container.innerHTML = '';
+            if (booksList.length === 0) return;
+
+            const booksByYear = {};
+            booksList.forEach(book => {
+                if (!booksByYear[book.year]) booksByYear[book.year] = [];
+                booksByYear[book.year].push(book);
+            });
+
+            Object.keys(booksByYear).forEach(year => {
+                booksByYear[year].sort((a, b) => b.month - a.month || a.title.localeCompare(b.title));
+            });
+
+            const years = Object.keys(booksByYear).sort((a, b) => b - a);
+            const currentYear = new Date().getFullYear();
+
+            const currentColumn = document.createElement('div');
+            currentColumn.className = 'books-column';
+            const pastColumn = document.createElement('div');
+            pastColumn.className = 'books-column';
+
+            const addYearSection = (target, year) => {
+                const title = document.createElement('h2');
+                title.textContent = year === currentYear ? `${year} (올해)` : year;
+                target.appendChild(title);
+
+                const list = document.createElement('ul');
+                booksByYear[year].forEach(book => {
+                    const item = document.createElement('li');
+                    const monthSpan = document.createElement('span');
+                    monthSpan.className = 'month';
+                    monthSpan.textContent = `${book.month}월`;
+
+                    const titleSpan = document.createElement('span');
+                    titleSpan.textContent = book.title;
+
+                    item.appendChild(monthSpan);
+                    item.appendChild(titleSpan);
+                    list.appendChild(item);
+                });
+                target.appendChild(list);
+            };
+
+            years.forEach(year => {
+                const column = parseInt(year, 10) === currentYear ? currentColumn : pastColumn;
+                addYearSection(column, parseInt(year, 10));
+            });
+
+            if (currentColumn.children.length > 0) container.appendChild(currentColumn);
+            if (pastColumn.children.length > 0) container.appendChild(pastColumn);
+        }
+
+        function updateTotalBooks() {
+            const total = booksList.length;
+            document.getElementById('total-books').textContent = `총 ${total}권의 책을 읽었어요`;
+        }
+
+        function showBookList(cell, books, year, month) {
+            hideBookList();
+            if (!books || books.length === 0) return;
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'book-tooltip';
+            tooltip.innerHTML = `
+                <div class="tooltip-header">${year}년 ${month} · ${books.length}권</div>
+                <div class="tooltip-content">
+                    ${books.map(book => `<div class="tooltip-book">• ${book.title}</div>`).join('')}
+                </div>
+            `;
+
+            const rect = cell.getBoundingClientRect();
+            let left = rect.left;
+            let top = rect.bottom + 6;
+            const tooltipWidth = 240;
+            const tooltipHeight = Math.min(books.length * 18 + 60, 220);
+
+            if (left + tooltipWidth > window.innerWidth) {
+                left = window.innerWidth - tooltipWidth - 12;
+            }
+            if (top + tooltipHeight > window.innerHeight) {
+                top = rect.top - tooltipHeight - 6;
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+            document.body.appendChild(tooltip);
+        }
+
+        function hideBookList() {
+            const tooltip = document.querySelector('.book-tooltip');
+            if (tooltip) tooltip.remove();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadBooksData);
+    </script>
+</body>
+</html>
