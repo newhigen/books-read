@@ -1,19 +1,17 @@
 # Books Read
 
-## 소개
+읽은 책 목록과 GitHub contribution graph 형태의 독서 히트맵을 보여주는 사이트입니다.  
 
-읽었던 책들을 보여주는 사이트입니다.
-
-csv 파일(`books.csv`)을 수정하면 GitHub contribution graph와 같은 독서 히트맵과 책 목록이 생성됩니다.
+`books.csv`만 수정하면 히트맵과 목록이 자동 생성됩니다.
 
 ## 사용법
+- 책을 읽을 때마다 `books.csv`에 **제목, 연도, 월**을 추가합니다.
+- 같은 책을 여러 번 읽었다면 각 시점을 별도로 기록합니다. 가장 최근 기록에는 `N회차` 태그가 붙습니다.
+- 히트맵의 총 권수는 같은 책을 여러번 읽으면 따로 계산됩니다.
+- 파비콘은 원하는 파일을 `favicon.ico`로 교체하면 됩니다.
 
-* 책을 읽으면 `books.csv`를 수정합니다.
-  * 제목, 연도, 월을 입력합니다.
-  * 한 책을 다른 연월에 여러번 읽었다면 각각 읽었던 기록을 기입합니다. 그러면 최근 읽었던 시점에 `N회차` 라는 태그가 표시됩니다. 독서 히트맵의 총 권수는 책 권 수가 아니라 독서 횟수로 계산합니다.
-* 사이트 favicon을 바꾸고 싶으면 원하는 파일을 가져와 `favicon.ico`이라는 이름으로 덮어씁니다.
-* GitHub pages(`github.io`)로 호스팅하려면 다음과 같은 방법이 있습니다.
-    * 이 repo를 본인 public repo로 가져가기 (e.g., fork)
-    * Settings → Pages 
-      * Source를 Deploy from a branch로 설정
-      * Branch를 main으로 설정
+## GitHub Pages로 호스팅
+- 이 repo를 public repo로 가져옵니다 (예: fork).
+- GitHub → Settings → Pages  
+  - **Source:** Deploy from a branch  
+  - **Branch:** main
