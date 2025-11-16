@@ -155,9 +155,17 @@ function createYearSection(year, isCurrentYear) {
     fragment.appendChild(createEl('h2', null, isCurrentYear ? `${year} (올해)` : year));
 
     const list = createEl('ul');
+    let lastMonth = null;
     (state.booksByYear.get(year) || []).forEach(book => {
         const item = createEl('li');
-        item.appendChild(createEl('span', 'month', formatMonth(book.month)));
+        const monthSpan = createEl('span', 'month');
+        if (lastMonth === book.month) {
+            monthSpan.textContent = '';
+        } else {
+            monthSpan.textContent = formatMonth(book.month);
+            lastMonth = book.month;
+        }
+        item.appendChild(monthSpan);
         item.appendChild(createEl('span', null, book.title));
         list.appendChild(item);
     });
