@@ -55,42 +55,6 @@ p#total-books {
     align-items: center;
 }
 
-.heatmap-months-top {
-    display: flex;
-    gap: 4px;
-    align-items: flex-end;
-    justify-content: center;
-}
-
-.corner-spacer {
-    width: 70px;
-    height: 18px;
-    margin-right: 12px;
-}
-
-.total-spacer {
-    width: 60px;
-    height: 18px;
-    margin-left: 6px;
-}
-
-.month-label-top {
-    width: 20px;
-    font-size: 11px;
-    color: #586069;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    box-sizing: border-box;
-}
-
-.season-emoji {
-    font-size: 12px;
-    line-height: 1;
-}
-
 .heatmap-body {
     display: flex;
     flex-direction: column;

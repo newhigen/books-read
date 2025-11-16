@@ -7,12 +7,6 @@ const dom = {
 };
 
 const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
-const seasonEmojis = {
-    3: '🌸',
-    6: '☀️',
-    9: '🍂',
-    12: '❄️'
-};
 const state = {
     books: [],
     booksByYear: new Map(),
@@ -95,7 +89,6 @@ function renderHeatmap() {
 
     const wrapper = document.createElement('div');
     wrapper.className = 'heatmap-grid';
-    wrapper.appendChild(buildMonthHeader());
 
     const body = document.createElement('div');
     body.className = 'heatmap-body';
@@ -235,37 +228,6 @@ function createLegend() {
 
     legendContainer.appendChild(legend);
     return legendContainer;
-}
-
-function buildMonthHeader() {
-    const header = document.createElement('div');
-    header.className = 'heatmap-months-top';
-
-    const corner = document.createElement('div');
-    corner.className = 'corner-spacer';
-    header.appendChild(corner);
-
-    for (let month = 1; month <= 12; month++) {
-        const label = document.createElement('div');
-        label.className = 'month-label-top';
-        const emoji = seasonEmojis[month];
-        if (emoji) {
-            const emojiSpan = document.createElement('span');
-            emojiSpan.className = 'season-emoji';
-            emojiSpan.textContent = emoji;
-            emojiSpan.setAttribute('aria-hidden', 'true');
-            label.appendChild(emojiSpan);
-        }
-        const textSpan = document.createElement('span');
-        textSpan.textContent = `${month}월`;
-        label.appendChild(textSpan);
-        header.appendChild(label);
-    }
-
-    const tail = document.createElement('div');
-    tail.className = 'total-spacer';
-    header.appendChild(tail);
-    return header;
 }
 
 function showBookList(cell, books, year, monthLabel) {
