@@ -6,7 +6,7 @@ const dom = {
     pastList: document.getElementById('past-books')
 };
 
-const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+const MONTHS_PER_YEAR = 12;
 const state = {
     books: [],
     booksByYear: new Map(),
@@ -39,37 +39,32 @@ function parseCSV(text) {
         headers.forEach((header, index) => {
             let value = cols[index] ?? '';
             if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
-            entry[header] = header === 'year' || header === 'month'
-                ? parseInt(value, 10) || 0
-                : value.trim();
+            if (header === 'year' || header === 'month') {
+                entry[header] = parseInt(value, 10) || 0;
+            } else {
+                entry[header] = value.trim();
+            }
         });
         if (entry.title && entry.year && entry.month) acc.push(entry);
         return acc;
     }, []);
 }
 
-function sortBooksDesc(a, b) {
-    if (a.year !== b.year) return b.year - a.year;
-    if (a.month !== b.month) return b.month - a.month;
-    return a.title.localeCompare(b.title);
-}
+const sortBooksDesc = (a, b) =>
+    (b.year - a.year) || (b.month - a.month) || a.title.localeCompare(b.title);
 
 function buildDerivedData() {
     state.booksByYear = new Map();
     state.heatmapBuckets = new Map();
 
     state.books.forEach(book => {
-        const yearBucket = state.booksByYear.get(book.year) ?? [];
-        yearBucket.push(book);
-        state.booksByYear.set(book.year, yearBucket);
-
-        const key = monthKey(book.year, book.month);
-        const monthly = state.heatmapBuckets.get(key) ?? [];
-        monthly.push(book);
-        state.heatmapBuckets.set(key, monthly);
+        getOrCreate(state.booksByYear, book.year).push(book);
+        getOrCreate(state.heatmapBuckets, monthKey(book.year, book.month)).push(book);
     });
 
-    state.booksByYear.forEach(list => list.sort((a, b) => b.month - a.month || a.title.localeCompare(b.title)));
+    state.booksByYear.forEach(list =>
+        list.sort((a, b) => (b.month - a.month) || a.title.localeCompare(b.title))
+    );
 }
 
 function renderHeatmap() {
@@ -83,31 +78,21 @@ function renderHeatmap() {
     const currentYear = new Date().getFullYear();
     const minYear = Math.min(...yearsWithData, currentYear);
     const years = [];
-    for (let year = currentYear; year >= minYear; year--) {
-        years.push(year);
-    }
+    for (let year = currentYear; year >= minYear; year--) years.push(year);
 
-    const wrapper = document.createElement('div');
-    wrapper.className = 'heatmap-grid';
-
-    const body = document.createElement('div');
-    body.className = 'heatmap-body';
+    const wrapper = createEl('div', 'heatmap-grid');
+    const body = createEl('div', 'heatmap-body');
     const now = new Date();
+    const nowYear = now.getFullYear();
+    const nowMonth = now.getMonth() + 1;
 
     years.forEach(year => {
-        const row = document.createElement('div');
-        row.className = 'heatmap-row';
+        const row = createEl('div', 'heatmap-row');
+        row.appendChild(createEl('div', 'year-label', year));
 
-        const yearLabel = document.createElement('div');
-        yearLabel.className = 'year-label';
-        yearLabel.textContent = year;
-        row.appendChild(yearLabel);
-
-        for (let month = 1; month <= 12; month++) {
-            const cell = document.createElement('div');
-            cell.className = 'heatmap-cell';
-
-            const isFuture = year > now.getFullYear() || (year === now.getFullYear() && month > now.getMonth() + 1);
+        for (let month = 1; month <= MONTHS_PER_YEAR; month++) {
+            const cell = createEl('div', 'heatmap-cell');
+            const isFuture = year > nowYear || (year === nowYear && month > nowMonth);
             if (isFuture) {
                 cell.style.visibility = 'hidden';
             } else {
@@ -115,21 +100,20 @@ function renderHeatmap() {
                 const count = monthBooks.length;
                 if (count > 0) {
                     cell.classList.add(`level-${Math.min(count, 4)}`);
-                    cell.addEventListener('mouseenter', () => showBookList(cell, monthBooks, year, monthNames[month - 1]));
+                    cell.addEventListener('mouseenter', () =>
+                        showBookList(cell, monthBooks, year, formatMonth(month))
+                    );
                     cell.addEventListener('mouseleave', hideBookList);
                 }
                 cell.title = `${year}년 ${month}월: ${count}권`;
             }
-
             row.appendChild(cell);
         }
 
-        const totalCell = document.createElement('div');
-        totalCell.className = 'year-total';
+        const totalCell = createEl('div', 'year-total');
         const total = state.booksByYear.get(year)?.length ?? 0;
         if (total) totalCell.textContent = `${total}권`;
         row.appendChild(totalCell);
-
         body.appendChild(row);
     });
 
@@ -167,22 +151,13 @@ function renderBookColumns() {
 
 function createYearSection(year, isCurrentYear) {
     const fragment = document.createDocumentFragment();
-    const header = document.createElement('h2');
-    header.textContent = isCurrentYear ? `${year} (올해)` : year;
-    fragment.appendChild(header);
+    fragment.appendChild(createEl('h2', null, isCurrentYear ? `${year} (올해)` : year));
 
-    const list = document.createElement('ul');
+    const list = createEl('ul');
     (state.booksByYear.get(year) || []).forEach(book => {
-        const item = document.createElement('li');
-        const monthSpan = document.createElement('span');
-        monthSpan.className = 'month';
-        monthSpan.textContent = `${book.month}월`;
-
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = book.title;
-
-        item.appendChild(monthSpan);
-        item.appendChild(titleSpan);
+        const item = createEl('li');
+        item.appendChild(createEl('span', 'month', formatMonth(book.month)));
+        item.appendChild(createEl('span', null, book.title));
         list.appendChild(item);
     });
 
@@ -199,11 +174,8 @@ function getBooksForMonth(year, month) {
 }
 
 function createLegend() {
-    const legendContainer = document.createElement('div');
-    legendContainer.className = 'heatmap-legend-wrapper';
-
-    const legend = document.createElement('div');
-    legend.className = 'heatmap-legend';
+    const legendContainer = createEl('div', 'heatmap-legend-wrapper');
+    const legend = createEl('div', 'heatmap-legend');
     const items = [
         { label: '1권', level: 1 },
         { label: '2권', level: 2 },
@@ -212,17 +184,9 @@ function createLegend() {
     ];
 
     items.forEach(item => {
-        const wrapper = document.createElement('span');
-        wrapper.className = 'heatmap-legend-item';
-
-        const square = document.createElement('span');
-        square.className = `heatmap-legend-square level-${item.level}`;
-
-        const text = document.createElement('span');
-        text.textContent = item.label;
-
-        wrapper.appendChild(square);
-        wrapper.appendChild(text);
+        const wrapper = createEl('span', 'heatmap-legend-item');
+        wrapper.appendChild(createEl('span', `heatmap-legend-square level-${item.level}`));
+        wrapper.appendChild(createEl('span', null, item.label));
         legend.appendChild(wrapper);
     });
 
@@ -260,3 +224,17 @@ function showBookList(cell, books, year, monthLabel) {
 function hideBookList() {
     document.querySelector('.book-tooltip')?.remove();
 }
+
+function createEl(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text !== undefined && text !== null) el.textContent = text;
+    return el;
+}
+
+function getOrCreate(map, key) {
+    if (!map.has(key)) map.set(key, []);
+    return map.get(key);
+}
+
+const formatMonth = month => `${month}월`;
