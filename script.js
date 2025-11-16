@@ -54,10 +54,18 @@ const sortBooksDesc = (a, b) =>
 function buildDerivedData() {
     state.booksByYear = new Map();
     state.heatmapBuckets = new Map();
+    state.bookCounts = new Map();
+    state.latestMonth = new Map();
 
     state.books.forEach(book => {
         getOrCreate(state.booksByYear, book.year).push(book);
         getOrCreate(state.heatmapBuckets, monthKey(book.year, book.month)).push(book);
+        const key = book.title;
+        state.bookCounts.set(key, (state.bookCounts.get(key) || 0) + 1);
+        const currentDate = book.year * 100 + book.month;
+        if (!state.latestMonth.has(key) || state.latestMonth.get(key) < currentDate) {
+            state.latestMonth.set(key, currentDate);
+        }
     });
 
     state.booksByYear.forEach(list =>
@@ -166,7 +174,14 @@ function createYearSection(year, isCurrentYear) {
             lastMonth = book.month;
         }
         item.appendChild(monthSpan);
-        item.appendChild(createEl('span', null, book.title));
+        const titleSpan = createEl('span', 'book-title', book.title);
+        const count = state.bookCounts.get(book.title);
+        const currentDate = book.year * 100 + book.month;
+        if (count > 1 && state.latestMonth.get(book.title) === currentDate) {
+            const badge = createEl('span', 'reread-badge', `${count}회차`);
+            titleSpan.appendChild(badge);
+        }
+        item.appendChild(titleSpan);
         list.appendChild(item);
     });
 

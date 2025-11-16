@@ -199,7 +199,7 @@ p#total-books {
     line-height: 1.3;
     display: flex;
     gap: 8px;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .books-column li span.month {
@@ -210,6 +210,27 @@ p#total-books {
     line-height: 1.3;
     display: inline-block;
     padding-top: 2px;
+}
+
+.book-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.reread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0px;
+    padding: 0 4px;
+    border-radius: 5px;
+    border: 1px solid #f0f0f0;
+    background: #fbfbfb;
+    color: #7a7f85;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.2;
 }
 
 .book-tooltip {
