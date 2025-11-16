@@ -22,7 +22,6 @@ p#total-books {
 }
 
 #reading-heatmap {
-    border: 1px solid #e1e4e8;
     border-radius: 12px;
     padding: 24px;
     background: #fff;
@@ -63,6 +62,7 @@ p#total-books {
     gap: 10px;
     flex-wrap: wrap;
     align-items: flex-start;
+    justify-content: center;
 }
 
 .heatmap-column {
@@ -96,7 +96,7 @@ p#total-books {
 }
 
 .heatmap-row .year-label {
-    width: 70px;
+    width: 32px;
     font-size: 12px;
     color: #586069;
     text-align: right;
@@ -170,15 +170,23 @@ p#total-books {
 .heatmap-legend-square.level-3 { background: #2f7fff; }
 .heatmap-legend-square.level-4 { background: #0f4da8; }
 
-.books-column {
-    flex: 0 0 220px;
-    min-width: 360px;
-    max-width: 360px;
+.books-column,
+.heatmap-column {
+    flex: 1 1 320px;
+    min-width: 240px;
+    max-width: 320px;
     background: #fff;
     border: 1px solid #e1e4e8;
     border-radius: 12px;
     padding: 20px;
     min-height: 200px;
+}
+
+.heatmap-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
 }
 
 .books-column h2 {
@@ -266,10 +274,11 @@ p#total-books {
 
     .heatmap-column,
     .books-column {
-        flex: 1 1 auto;
-        max-width: none;
+        flex: 0 0 100%;
+        max-width: 420px;
         width: 100%;
         min-width: 0;
+        margin: 0 auto;
     }
 
     #reading-heatmap {
