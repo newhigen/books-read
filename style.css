@@ -1,0 +1,292 @@
+:root {
+    color-scheme: light dark;
+}
+
+body {
+    margin: 0;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: #f6f8fa;
+    color: #24292e;
+}
+
+h1 {
+    margin-bottom: 8px;
+    font-size: 28px;
+}
+
+p#total-books {
+    margin-top: 0;
+    margin-bottom: 24px;
+    color: #586069;
+}
+
+#reading-heatmap {
+    border-radius: 12px;
+    padding: 24px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.heatmap-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.heatmap-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1f2328;
+}
+
+.heatmap-summary {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: #586069;
+}
+
+.heatmap-empty {
+    color: #6a737d;
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+}
+
+.reading-layout {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.heatmap-column {
+    flex: 1 1 420px;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.heatmap-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.heatmap-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+
+.heatmap-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+}
+
+.heatmap-row .year-label {
+    width: 32px;
+    font-size: 12px;
+    color: #586069;
+    text-align: right;
+    font-weight: 500;
+    margin-right: 12px;
+}
+
+.heatmap-cell {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.15s ease;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.heatmap-cell.level-1 { background: #cfe7ff; border-color: transparent; }
+.heatmap-cell.level-2 { background: #80b9ff; border-color: transparent; }
+.heatmap-cell.level-3 { background: #2f7fff; border-color: transparent; }
+.heatmap-cell.level-4 { background: #0f4da8; border-color: transparent; }
+
+.heatmap-cell:hover {
+    transform: translateY(-2px);
+}
+
+.year-total {
+    width: 36px;
+    color: #586069;
+    text-align: right;
+    font-size: 12px;
+    margin-left: 6px;
+}
+
+.heatmap-legend {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    align-items: center;
+    font-size: 11px;
+    color: #586069;
+}
+
+.heatmap-legend-wrapper {
+    display: inline-flex;
+    justify-content: center;
+    padding: 6px 6px;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    background: #fdfdfd;
+    margin-top: 16px;
+    align-self: center;
+}
+
+.heatmap-legend-item {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.heatmap-legend-square {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: #e3efff;
+}
+
+.heatmap-legend-square.level-1 { background: #b3d4ff; }
+.heatmap-legend-square.level-2 { background: #6ba7ff; }
+.heatmap-legend-square.level-3 { background: #2f7fff; }
+.heatmap-legend-square.level-4 { background: #0f4da8; }
+
+.books-column,
+.heatmap-column {
+    flex: 1 1 320px;
+    min-width: 240px;
+    max-width: 320px;
+    background: #fff;
+    border: 1px solid #e1e4e8;
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 200px;
+}
+
+.heatmap-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.books-column h2 {
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 18px;
+}
+
+.books-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.books-column li {
+    font-size: 14px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.books-column li span.month {
+    min-width: 32px;
+    color: #6a737d;
+    font-size: 12px;
+    text-align: right;
+    line-height: 1.3;
+    display: inline-block;
+    padding-top: 2px;
+}
+
+.book-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.reread-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0px;
+    padding: 0 4px;
+    border-radius: 5px;
+    border: 1px solid #f0f0f0;
+    background: #fbfbfb;
+    color: #7a7f85;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.book-tooltip {
+    position: fixed;
+    background: #24292e;
+    color: white;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    max-width: 240px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+
+.book-tooltip .tooltip-header {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.book-tooltip .tooltip-book {
+    margin: 4px 0;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+
+    .reading-layout {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .heatmap-column,
+    .books-column {
+        flex: 0 0 100%;
+        max-width: 420px;
+        width: 100%;
+        min-width: 0;
+        margin: 0 auto;
+    }
+
+    #reading-heatmap {
+        margin-bottom: 6px;
+    }
+
+    .heatmap-cell {
+        width: 16px;
+        height: 16px;
+    }
+}
