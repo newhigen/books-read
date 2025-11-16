@@ -43,7 +43,7 @@ p#total-books {
 
 .month-labels,
 .row-spacer {
-    width: 52px;
+    width: 70px;
     flex-shrink: 0;
 }
 
@@ -60,6 +60,15 @@ p#total-books {
     justify-content: flex-end;
     font-size: 11px;
     color: #586069;
+    gap: 4px;
+}
+
+.season-emoji {
+    font-size: 12px;
+    line-height: 1;
+    margin-right: auto;
+    width: 40px;
+    text-align: right;
 }
 
 .heatmap-year-row .year-label {
