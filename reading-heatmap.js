@@ -78,29 +78,47 @@ function renderHeatmap() {
         return;
     }
 
-    const years = Array.from(state.booksByYear.keys()).sort((a, b) => b - a);
+    const yearsWithData = Array.from(state.booksByYear.keys()).sort((a, b) => a - b);
     const currentYear = new Date().getFullYear();
-    const minYear = Math.min(...years, currentYear);
+    const minYear = Math.min(...yearsWithData, currentYear);
+    const maxYear = Math.max(...yearsWithData, currentYear);
     const now = new Date();
 
-    const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;justify-content:center;';
-
-    const yearLabels = document.createElement('div');
-    yearLabels.className = 'year-labels';
-    for (let year = currentYear; year >= minYear; year--) {
-        const label = document.createElement('div');
-        label.style.cssText = 'height:16px;display:flex;align-items:center;justify-content:flex-end;font-size:12px;color:#586069;';
-        label.textContent = year;
-        yearLabels.appendChild(label);
+    const years = [];
+    for (let year = minYear; year <= maxYear; year++) {
+        years.push(year);
     }
 
-    const rows = document.createElement('div');
-    rows.style.cssText = 'display:flex;flex-direction:column;gap:4px;';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'heatmap-grid';
 
-    for (let year = currentYear; year >= minYear; year--) {
-        const row = document.createElement('div');
-        row.className = 'heatmap-row';
+    const yearRow = document.createElement('div');
+    yearRow.className = 'heatmap-year-row';
+    const topSpacer = document.createElement('div');
+    topSpacer.className = 'row-spacer';
+    yearRow.appendChild(topSpacer);
+    years.forEach(year => {
+        const label = document.createElement('div');
+        label.className = 'year-label';
+        label.textContent = year;
+        yearRow.appendChild(label);
+    });
+
+    const columnsWrapper = document.createElement('div');
+    columnsWrapper.className = 'heatmap-columns';
+
+    const monthLabels = document.createElement('div');
+    monthLabels.className = 'month-labels';
+    monthNames.forEach(name => {
+        const label = document.createElement('div');
+        label.textContent = name;
+        monthLabels.appendChild(label);
+    });
+    columnsWrapper.appendChild(monthLabels);
+
+    years.forEach(year => {
+        const column = document.createElement('div');
+        column.className = 'heatmap-column';
 
         for (let month = 1; month <= 12; month++) {
             const cell = document.createElement('div');
@@ -119,20 +137,32 @@ function renderHeatmap() {
                 }
                 cell.title = `${year}년 ${month}월: ${count}권`;
             }
-            row.appendChild(cell);
+
+            column.appendChild(cell);
         }
 
-        const yearTotal = state.booksByYear.get(year)?.length ?? 0;
-        const badge = document.createElement('div');
-        badge.style.cssText = 'font-size:12px;color:#586069;min-width:40px;text-align:right;';
-        badge.textContent = yearTotal ? `${yearTotal}권` : '';
-        row.appendChild(badge);
+        columnsWrapper.appendChild(column);
+    });
 
-        rows.appendChild(row);
-    }
+    const totalsRow = document.createElement('div');
+    totalsRow.className = 'year-totals-row';
+    const bottomSpacer = document.createElement('div');
+    bottomSpacer.className = 'row-spacer';
+    totalsRow.appendChild(bottomSpacer);
 
-    wrapper.appendChild(yearLabels);
-    wrapper.appendChild(rows);
+    years.forEach(year => {
+        const totalCell = document.createElement('div');
+        totalCell.className = 'year-total';
+        const total = state.booksByYear.get(year)?.length ?? 0;
+        if (total) {
+            totalCell.textContent = total;
+        }
+        totalsRow.appendChild(totalCell);
+    });
+
+    wrapper.appendChild(yearRow);
+    wrapper.appendChild(columnsWrapper);
+    wrapper.appendChild(totalsRow);
     dom.heatmap.appendChild(wrapper);
 }
 
