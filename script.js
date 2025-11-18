@@ -69,6 +69,13 @@ const state = {
     yearRefs: []
 };
 
+const normalizeText = value => (value ?? '').trim();
+const getCanonicalTitle = book => normalizeText(book.title) || normalizeText(book.englishTitle);
+const getLocalizedTitle = book =>
+    state.language === 'ko'
+        ? (normalizeText(book.title) || normalizeText(book.englishTitle))
+        : (normalizeText(book.englishTitle) || normalizeText(book.title));
+
 const t = (key, ...args) => {
     const value = TEXT[state.language][key];
     return typeof value === 'function' ? value(...args) : value;
@@ -121,23 +128,29 @@ function parseCSV(text) {
     return rows.reduce((acc, line) => {
         if (!line.trim()) return acc;
         const cols = line.split(',');
-        const entry = {};
+        const entry = { title: '', englishTitle: '' };
         headers.forEach((header, index) => {
             let value = cols[index] ?? '';
             if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
-            if (header === 'year' || header === 'month') {
-                entry[header] = parseInt(value, 10) || 0;
-            } else {
-                entry[header] = value.trim();
+            value = value.trim();
+            const headerName = header.trim().toLowerCase();
+            if (headerName === 'year' || headerName === 'month') {
+                entry[headerName] = parseInt(value, 10) || 0;
+            } else if (headerName === 'english-title') {
+                entry.englishTitle = value;
+            } else if (headerName === 'title') {
+                entry.title = value;
             }
         });
-        if (entry.title && entry.year && entry.month) acc.push(entry);
+        if ((entry.title || entry.englishTitle) && entry.year && entry.month) acc.push(entry);
         return acc;
     }, []);
 }
 
 const sortBooksDesc = (a, b) =>
-    (b.year - a.year) || (b.month - a.month) || a.title.localeCompare(b.title);
+    (b.year - a.year) ||
+    (b.month - a.month) ||
+    getCanonicalTitle(a).localeCompare(getCanonicalTitle(b));
 
 function buildDerivedData() {
     state.booksByYear = new Map();
@@ -146,9 +159,11 @@ function buildDerivedData() {
     state.latestMonth = new Map();
 
     state.books.forEach(book => {
+        const key = getCanonicalTitle(book);
+        if (!key) return;
+        book.canonicalTitle = key;
         getOrCreate(state.booksByYear, book.year).push(book);
         getOrCreate(state.heatmapBuckets, monthKey(book.year, book.month)).push(book);
-        const key = book.title;
         state.bookCounts.set(key, (state.bookCounts.get(key) || 0) + 1);
         const snapshot = book.year * 100 + book.month;
         if (!state.latestMonth.has(key) || state.latestMonth.get(key) < snapshot) {
@@ -157,7 +172,10 @@ function buildDerivedData() {
     });
 
     state.booksByYear.forEach(list =>
-        list.sort((a, b) => (b.month - a.month) || a.title.localeCompare(b.title))
+        list.sort(
+            (a, b) =>
+                (b.month - a.month) || getCanonicalTitle(a).localeCompare(getCanonicalTitle(b))
+        )
     );
 }
 
@@ -304,10 +322,12 @@ function createYearSection(year) {
         monthSpans.push(monthSpan);
         item.appendChild(monthSpan);
 
-        const titleSpan = createEl('span', 'book-title', book.title);
-        const count = state.bookCounts.get(book.title);
+        const displayTitle = getLocalizedTitle(book);
+        const titleSpan = createEl('span', 'book-title', displayTitle);
+        const canonical = book.canonicalTitle || getCanonicalTitle(book);
+        const count = state.bookCounts.get(canonical) || 0;
         const snapshot = book.year * 100 + book.month;
-        if (count > 1 && state.latestMonth.get(book.title) === snapshot) {
+        if (count > 1 && state.latestMonth.get(canonical) === snapshot) {
             const badge = createEl('span', 'reread-badge', t('rereadBadge', count));
             titleSpan.appendChild(badge);
             badgeSpans.push({ el: badge, count });
@@ -340,7 +360,9 @@ function showBookList(cell, books, year, monthLabel) {
     tooltip.innerHTML = `
         <div class="tooltip-header">${headerText}</div>
         <div class="tooltip-content">
-            ${books.map(book => `<div class="tooltip-book">${bullet} ${book.title}</div>`).join('')}
+            ${books
+                .map(book => `<div class="tooltip-book">${bullet} ${getLocalizedTitle(book)}</div>`)
+                .join('')}
         </div>
     `;
 
