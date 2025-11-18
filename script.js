@@ -2,19 +2,72 @@
 const dom = {
     heatmap: document.getElementById('reading-heatmap'),
     currentList: document.getElementById('current-books'),
-    pastList: document.getElementById('past-books')
+    pastList: document.getElementById('past-books'),
+    languageToggle: document.getElementById('language-toggle')
 };
 
 const MONTHS_PER_YEAR = 12;
 const state = {
     books: [],
     booksByYear: new Map(),
-    heatmapBuckets: new Map()
+    heatmapBuckets: new Map(),
+    language: 'ko'
+};
+
+const MONTH_LABELS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const TEXT = {
+    ko: {
+        heatmapTitle: '독서 히트맵',
+        totalBooks: count => `총 ${count}권 읽었어요`,
+        heatmapEmpty: '표시할 데이터가 없어요.',
+        loadError: '데이터를 불러오지 못했어요.',
+        noBooks: '표시할 책이 없어요.',
+        noCurrentBooks: '올해 데이터가 없어요.',
+        noPastBooks: '이전 연도 데이터가 없어요.',
+        yearHeading: (year, isCurrent) => (isCurrent ? `${year} (올해)` : `${year}`),
+        yearSummary: count => `${count}권 읽음`,
+        formatMonth: month => `${month}월`,
+        tooltipHeader: (year, monthLabel, count) => `${year}년 ${monthLabel} · ${count}권`,
+        cellTitle: (year, monthLabel, count) => `${year}년 ${monthLabel}: ${count}권`,
+        rereadBadge: count => `${count}회차`,
+        yearTotal: count => `${count}권`,
+        legendLabels: ['1', '2', '3', '4+'],
+        toggleLabel: 'EN',
+        toggleAriaLabel: '영어 모드로 전환',
+        tooltipBullet: '•'
+    },
+    en: {
+        heatmapTitle: 'Reading Heatmap',
+        totalBooks: count => `Read ${count} books in total`,
+        heatmapEmpty: 'No reading data yet.',
+        loadError: 'Unable to load data.',
+        noBooks: 'No books to show.',
+        noCurrentBooks: 'No books for this year.',
+        noPastBooks: 'No books from previous years.',
+        yearHeading: (year, isCurrent) => (isCurrent ? `${year} (This Year)` : `${year}`),
+        yearSummary: count => `Read ${count} books`,
+        formatMonth: month => MONTH_LABELS_EN[month - 1] || `M${month}`,
+        tooltipHeader: (year, monthLabel, count) => `${monthLabel} ${year} · ${count} books`,
+        cellTitle: (year, monthLabel, count) => `${monthLabel} ${year}: ${count} books`,
+        rereadBadge: count => `${count}x read`,
+        yearTotal: count => `${count} books`,
+        legendLabels: ['1', '2', '3', '4+'],
+        toggleLabel: 'KO',
+        toggleAriaLabel: 'Switch to Korean',
+        tooltipBullet: '•'
+    }
+};
+
+const t = (key, ...args) => {
+    const text = TEXT[state.language][key];
+    return typeof text === 'function' ? text(...args) : text;
 };
 
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
+    initLanguageToggle();
     try {
         const csv = await fetch('books.csv').then(res => res.text());
         state.books = parseCSV(csv).sort(sortBooksDesc);
@@ -22,9 +75,28 @@ async function init() {
         renderHeatmap();
         renderBookColumns();
     } catch (error) {
-        console.error('CSV를 불러오는 중 문제가 발생했습니다.', error);
-        dom.heatmap.textContent = '데이터를 불러오지 못했어요.';
+        console.error(t('loadError'), error);
+        dom.heatmap.textContent = t('loadError');
     }
+}
+
+function initLanguageToggle() {
+    if (!dom.languageToggle) return;
+    updateLanguageToggleUI();
+    dom.languageToggle.addEventListener('click', () => {
+        state.language = state.language === 'ko' ? 'en' : 'ko';
+        updateLanguageToggleUI();
+        renderHeatmap();
+        renderBookColumns();
+    });
+}
+
+function updateLanguageToggleUI() {
+    if (!dom.languageToggle) return;
+    dom.languageToggle.textContent = t('toggleLabel');
+    dom.languageToggle.setAttribute('aria-label', t('toggleAriaLabel'));
+    dom.languageToggle.setAttribute('aria-pressed', state.language === 'en');
+    document.documentElement.lang = state.language;
 }
 
 function parseCSV(text) {
@@ -79,7 +151,7 @@ function renderHeatmap() {
     dom.heatmap.appendChild(createHeatmapHeader(totalCount));
 
     if (totalCount === 0) {
-        dom.heatmap.appendChild(createEl('p', 'heatmap-empty', '표시할 데이터가 없어요.'));
+        dom.heatmap.appendChild(createEl('p', 'heatmap-empty', t('heatmapEmpty')));
         return;
     }
 
@@ -105,23 +177,24 @@ function renderHeatmap() {
             if (isFuture) {
                 cell.style.visibility = 'hidden';
             } else {
+                const monthLabel = t('formatMonth', month);
                 const monthBooks = getBooksForMonth(year, month);
                 const count = monthBooks.length;
                 if (count > 0) {
                     cell.classList.add(`level-${Math.min(count, 4)}`);
                     cell.addEventListener('mouseenter', () =>
-                        showBookList(cell, monthBooks, year, formatMonth(month))
+                        showBookList(cell, monthBooks, year, monthLabel)
                     );
                     cell.addEventListener('mouseleave', hideBookList);
                 }
-                cell.title = `${year}년 ${month}월: ${count}권`;
+                cell.title = t('cellTitle', year, monthLabel, count);
             }
             row.appendChild(cell);
         }
 
         const totalCell = createEl('div', 'year-total');
         const total = state.booksByYear.get(year)?.length ?? 0;
-        if (total) totalCell.textContent = `${total}권`;
+        if (total) totalCell.textContent = t('yearTotal', total);
         row.appendChild(totalCell);
         body.appendChild(row);
     });
@@ -135,7 +208,7 @@ function renderBookColumns() {
     dom.currentList.innerHTML = '';
     dom.pastList.innerHTML = '';
     if (state.books.length === 0) {
-        dom.currentList.textContent = '표시할 책이 없어요.';
+        dom.currentList.textContent = t('noBooks');
         dom.pastList.textContent = '';
         return;
     }
@@ -150,29 +223,29 @@ function renderBookColumns() {
         });
 
     if (!dom.currentList.childElementCount) {
-        dom.currentList.textContent = '올해 데이터가 없어요.';
+        dom.currentList.textContent = t('noCurrentBooks');
     }
 
     if (!dom.pastList.childElementCount) {
-        dom.pastList.textContent = '이전 연도 데이터가 없어요.';
+        dom.pastList.textContent = t('noPastBooks');
     }
 }
 
 function createYearSection(year, isCurrentYear) {
     const fragment = document.createDocumentFragment();
-    fragment.appendChild(createEl('h2', null, isCurrentYear ? `${year} (올해)` : year));
+    fragment.appendChild(createEl('h2', null, t('yearHeading', year, isCurrentYear)));
 
     const list = createEl('ul');
     let lastMonth = null;
     const books = state.booksByYear.get(year) || [];
-    fragment.appendChild(createEl('p', 'year-summary', `${books.length}권 읽음`));
+    fragment.appendChild(createEl('p', 'year-summary', t('yearSummary', books.length)));
     books.forEach(book => {
         const item = createEl('li');
         const monthSpan = createEl('span', 'month');
         if (lastMonth === book.month) {
             monthSpan.textContent = '';
         } else {
-            monthSpan.textContent = formatMonth(book.month);
+            monthSpan.textContent = t('formatMonth', book.month);
             lastMonth = book.month;
         }
         item.appendChild(monthSpan);
@@ -180,7 +253,7 @@ function createYearSection(year, isCurrentYear) {
         const count = state.bookCounts.get(book.title);
         const currentDate = book.year * 100 + book.month;
         if (count > 1 && state.latestMonth.get(book.title) === currentDate) {
-            const badge = createEl('span', 'reread-badge', `${count}회차`);
+            const badge = createEl('span', 'reread-badge', t('rereadBadge', count));
             titleSpan.appendChild(badge);
         }
         item.appendChild(titleSpan);
@@ -202,17 +275,12 @@ function getBooksForMonth(year, month) {
 function createLegend() {
     const legendContainer = createEl('div', 'heatmap-legend-wrapper');
     const legend = createEl('div', 'heatmap-legend');
-    const items = [
-        { label: '1권', level: 1 },
-        { label: '2권', level: 2 },
-        { label: '3권', level: 3 },
-        { label: '4권 이상', level: 4 }
-    ];
+    const labels = t('legendLabels');
 
-    items.forEach(item => {
+    labels.forEach((label, index) => {
         const wrapper = createEl('span', 'heatmap-legend-item');
-        wrapper.appendChild(createEl('span', `heatmap-legend-square level-${item.level}`));
-        wrapper.appendChild(createEl('span', null, item.label));
+        wrapper.appendChild(createEl('span', `heatmap-legend-square level-${index + 1}`));
+        wrapper.appendChild(createEl('span', null, label));
         legend.appendChild(wrapper);
     });
 
@@ -226,10 +294,12 @@ function showBookList(cell, books, year, monthLabel) {
 
     const tooltip = document.createElement('div');
     tooltip.className = 'book-tooltip';
+    const headerText = t('tooltipHeader', year, monthLabel, books.length);
+    const bullet = t('tooltipBullet');
     tooltip.innerHTML = `
-        <div class="tooltip-header">${year}년 ${monthLabel} · ${books.length}권</div>
+        <div class="tooltip-header">${headerText}</div>
         <div class="tooltip-content">
-            ${books.map(book => `<div class="tooltip-book">• ${book.title}</div>`).join('')}
+            ${books.map(book => `<div class="tooltip-book">${bullet} ${book.title}</div>`).join('')}
         </div>
     `;
 
@@ -263,12 +333,9 @@ function getOrCreate(map, key) {
     return map.get(key);
 }
 
-const formatMonth = month => `${month}월`;
-const formatTotal = count => `총 ${count}권 읽었어요`;
-
 function createHeatmapHeader(totalCount) {
     const header = createEl('div', 'heatmap-header');
-    header.appendChild(createEl('h2', 'heatmap-title', '독서 히트맵'));
-    header.appendChild(createEl('p', 'heatmap-summary', formatTotal(totalCount)));
+    header.appendChild(createEl('h2', 'heatmap-title', t('heatmapTitle')));
+    header.appendChild(createEl('p', 'heatmap-summary', t('totalBooks', totalCount)));
     return header;
 }

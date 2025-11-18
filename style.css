@@ -10,6 +10,35 @@ body {
     color: #24292e;
 }
 
+.page-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+#language-toggle {
+    border: 1px solid #d0d7de;
+    background: #ffffff;
+    color: #1f2328;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#language-toggle:hover {
+    background: #f3f4f6;
+}
+
+#language-toggle[aria-pressed="true"] {
+    background: #1f2328;
+    color: #ffffff;
+    border-color: #1f2328;
+}
+
 h1 {
     margin-bottom: 8px;
     font-size: 28px;
@@ -104,17 +133,32 @@ p#total-books {
     box-sizing: border-box;
 }
 
-.heatmap-cell.level-1 { background: #cfe7ff; border-color: transparent; }
-.heatmap-cell.level-2 { background: #80b9ff; border-color: transparent; }
-.heatmap-cell.level-3 { background: #2f7fff; border-color: transparent; }
-.heatmap-cell.level-4 { background: #0f4da8; border-color: transparent; }
+.heatmap-cell.level-1 {
+    background: #cfe7ff;
+    border-color: transparent;
+}
+
+.heatmap-cell.level-2 {
+    background: #80b9ff;
+    border-color: transparent;
+}
+
+.heatmap-cell.level-3 {
+    background: #2f7fff;
+    border-color: transparent;
+}
+
+.heatmap-cell.level-4 {
+    background: #0f4da8;
+    border-color: transparent;
+}
 
 .heatmap-cell:hover {
     transform: translateY(-2px);
 }
 
 .year-total {
-    width: 36px;
+    width: 52px;
     color: #586069;
     text-align: right;
     font-size: 12px;
@@ -154,10 +198,21 @@ p#total-books {
     background: #e3efff;
 }
 
-.heatmap-legend-square.level-1 { background: #b3d4ff; }
-.heatmap-legend-square.level-2 { background: #6ba7ff; }
-.heatmap-legend-square.level-3 { background: #2f7fff; }
-.heatmap-legend-square.level-4 { background: #0f4da8; }
+.heatmap-legend-square.level-1 {
+    background: #b3d4ff;
+}
+
+.heatmap-legend-square.level-2 {
+    background: #6ba7ff;
+}
+
+.heatmap-legend-square.level-3 {
+    background: #2f7fff;
+}
+
+.heatmap-legend-square.level-4 {
+    background: #0f4da8;
+}
 
 .column-card {
     flex: 1 1 360px;
@@ -254,7 +309,7 @@ p#total-books {
     border-radius: 6px;
     font-size: 12px;
     max-width: 240px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
 }
 
