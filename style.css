@@ -196,29 +196,33 @@ p#total-books {
     margin: 0;
 }
 
-    .books-column li {
-        font-size: 13px;
-        margin-bottom: 8px;
-        line-height: 1.3;
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
+.books-column li {
+    font-size: 13px;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    column-gap: 8px;
+    align-items: center;
+}
 
-    .books-column li span.month {
-        min-width: 28px;
-        color: #6a737d;
-        font-size: 11px;
-        text-align: right;
-        line-height: 1.2;
-        display: inline-block;
-        padding-top: 2px;
-    }
+.books-column li span.month {
+    width: 36px;
+    color: #6a737d;
+    font-size: 11px;
+    text-align: right;
+    line-height: 1.2;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
 
 .book-title {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 4px;
+    min-width: 0;
+    flex-wrap: wrap;
 }
 
 .reread-badge {
