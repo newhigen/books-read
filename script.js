@@ -164,7 +164,9 @@ function createYearSection(year, isCurrentYear) {
 
     const list = createEl('ul');
     let lastMonth = null;
-    (state.booksByYear.get(year) || []).forEach(book => {
+    const books = state.booksByYear.get(year) || [];
+    fragment.appendChild(createEl('p', 'year-summary', `${books.length}권 읽음`));
+    books.forEach(book => {
         const item = createEl('li');
         const monthSpan = createEl('span', 'month');
         if (lastMonth === book.month) {

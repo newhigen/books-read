@@ -196,6 +196,12 @@ p#total-books {
     margin: 0;
 }
 
+.year-summary {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: #6a737d;
+}
+
 .books-column li {
     font-size: 13px;
     margin-bottom: 8px;
