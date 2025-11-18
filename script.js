@@ -1,7 +1,6 @@
 // DOM 캐시와 상태를 분리해 두면 아래 함수들이 깔끔해진다.
 const dom = {
     heatmap: document.getElementById('reading-heatmap'),
-    currentList: document.getElementById('current-books'),
     pastList: document.getElementById('past-books'),
     languageToggle: document.getElementById('language-toggle')
 };
@@ -11,7 +10,8 @@ const state = {
     books: [],
     booksByYear: new Map(),
     heatmapBuckets: new Map(),
-    language: 'ko'
+    language: 'ko',
+    yearRefs: []
 };
 
 const MONTH_LABELS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -25,13 +25,13 @@ const TEXT = {
         noBooks: '표시할 책이 없어요.',
         noCurrentBooks: '올해 데이터가 없어요.',
         noPastBooks: '이전 연도 데이터가 없어요.',
-        yearHeading: (year, isCurrent) => (isCurrent ? `${year} (올해)` : `${year}`),
+        yearHeading: year => `${year}`,
         yearSummary: count => `${count}권 읽음`,
         formatMonth: month => `${month}월`,
         tooltipHeader: (year, monthLabel, count) => `${year}년 ${monthLabel} · ${count}권`,
         cellTitle: (year, monthLabel, count) => `${year}년 ${monthLabel}: ${count}권`,
         rereadBadge: count => `${count}회차`,
-        yearTotal: count => `${count}권`,
+        yearTotal: count => `${count}`,
         legendLabels: ['1', '2', '3', '4+'],
         toggleLabel: 'EN',
         toggleAriaLabel: '영어 모드로 전환',
@@ -45,13 +45,13 @@ const TEXT = {
         noBooks: 'No books to show.',
         noCurrentBooks: 'No books for this year.',
         noPastBooks: 'No books from previous years.',
-        yearHeading: (year, isCurrent) => (isCurrent ? `${year} (This Year)` : `${year}`),
+        yearHeading: year => `${year}`,
         yearSummary: count => `Read ${count} books`,
         formatMonth: month => MONTH_LABELS_EN[month - 1] || `M${month}`,
         tooltipHeader: (year, monthLabel, count) => `${monthLabel} ${year} · ${count} books`,
         cellTitle: (year, monthLabel, count) => `${monthLabel} ${year}: ${count} books`,
         rereadBadge: count => `${count}x read`,
-        yearTotal: count => `${count} books`,
+        yearTotal: count => `${count}`,
         legendLabels: ['1', '2', '3', '4+'],
         toggleLabel: 'KO',
         toggleAriaLabel: 'Switch to Korean',
@@ -87,7 +87,7 @@ function initLanguageToggle() {
         state.language = state.language === 'ko' ? 'en' : 'ko';
         updateLanguageToggleUI();
         renderHeatmap();
-        renderBookColumns();
+        updateBookColumnsLanguage();
     });
 }
 
@@ -146,99 +146,140 @@ function buildDerivedData() {
 }
 
 function renderHeatmap() {
-    dom.heatmap.innerHTML = '';
-    const totalCount = state.books.length;
-    dom.heatmap.appendChild(createHeatmapHeader(totalCount));
+    updateWithPreservedHeight(dom.heatmap, () => {
+        dom.heatmap.innerHTML = '';
+        const totalCount = state.books.length;
+        dom.heatmap.appendChild(createHeatmapHeader(totalCount));
 
-    if (totalCount === 0) {
-        dom.heatmap.appendChild(createEl('p', 'heatmap-empty', t('heatmapEmpty')));
-        return;
-    }
-
-    const yearsWithData = Array.from(state.booksByYear.keys()).sort((a, b) => a - b);
-    const currentYear = new Date().getFullYear();
-    const minYear = Math.min(...yearsWithData, currentYear);
-    const years = [];
-    for (let year = currentYear; year >= minYear; year--) years.push(year);
-
-    const wrapper = createEl('div', 'heatmap-grid');
-    const body = createEl('div', 'heatmap-body');
-    const now = new Date();
-    const nowYear = now.getFullYear();
-    const nowMonth = now.getMonth() + 1;
-
-    years.forEach(year => {
-        const row = createEl('div', 'heatmap-row');
-        row.appendChild(createEl('div', 'year-label', year));
-
-        for (let month = 1; month <= MONTHS_PER_YEAR; month++) {
-            const cell = createEl('div', 'heatmap-cell');
-            const isFuture = year > nowYear || (year === nowYear && month > nowMonth);
-            if (isFuture) {
-                cell.style.visibility = 'hidden';
-            } else {
-                const monthLabel = t('formatMonth', month);
-                const monthBooks = getBooksForMonth(year, month);
-                const count = monthBooks.length;
-                if (count > 0) {
-                    cell.classList.add(`level-${Math.min(count, 4)}`);
-                    cell.addEventListener('mouseenter', () =>
-                        showBookList(cell, monthBooks, year, monthLabel)
-                    );
-                    cell.addEventListener('mouseleave', hideBookList);
-                }
-                cell.title = t('cellTitle', year, monthLabel, count);
-            }
-            row.appendChild(cell);
+        if (totalCount === 0) {
+            dom.heatmap.appendChild(createEl('p', 'heatmap-empty', t('heatmapEmpty')));
+            return;
         }
 
-        const totalCell = createEl('div', 'year-total');
-        const total = state.booksByYear.get(year)?.length ?? 0;
-        if (total) totalCell.textContent = t('yearTotal', total);
-        row.appendChild(totalCell);
-        body.appendChild(row);
-    });
+        const yearsWithData = Array.from(state.booksByYear.keys()).sort((a, b) => a - b);
+        const currentYear = new Date().getFullYear();
+        const minYear = Math.min(...yearsWithData, currentYear);
+        const years = [];
+        for (let year = currentYear; year >= minYear; year--) years.push(year);
 
-    wrapper.appendChild(body);
-    dom.heatmap.appendChild(wrapper);
-    dom.heatmap.appendChild(createLegend());
+        const wrapper = createEl('div', 'heatmap-grid');
+        const body = createEl('div', 'heatmap-body');
+        const now = new Date();
+        const nowYear = now.getFullYear();
+        const nowMonth = now.getMonth() + 1;
+
+        years.forEach(year => {
+            const row = createEl('div', 'heatmap-row');
+            row.appendChild(createEl('div', 'year-label', year));
+
+            for (let month = 1; month <= MONTHS_PER_YEAR; month++) {
+                const cell = createEl('div', 'heatmap-cell');
+                const isFuture = year > nowYear || (year === nowYear && month > nowMonth);
+                if (isFuture) {
+                    cell.style.visibility = 'hidden';
+                } else {
+                    const monthLabel = t('formatMonth', month);
+                    const monthBooks = getBooksForMonth(year, month);
+                    const count = monthBooks.length;
+                    if (count > 0) {
+                        cell.classList.add(`level-${Math.min(count, 4)}`);
+                        cell.addEventListener('mouseenter', () =>
+                            showBookList(cell, monthBooks, year, monthLabel)
+                        );
+                        cell.addEventListener('mouseleave', hideBookList);
+                    }
+                    cell.title = t('cellTitle', year, monthLabel, count);
+                }
+                row.appendChild(cell);
+            }
+
+            const totalCell = createEl('div', 'year-total');
+            const total = state.booksByYear.get(year)?.length ?? 0;
+            if (total) totalCell.textContent = t('yearTotal', total);
+            row.appendChild(totalCell);
+            body.appendChild(row);
+        });
+
+        wrapper.appendChild(body);
+        dom.heatmap.appendChild(wrapper);
+        dom.heatmap.appendChild(createLegend());
+    });
 }
 
 function renderBookColumns() {
-    dom.currentList.innerHTML = '';
-    dom.pastList.innerHTML = '';
+    state.yearRefs = [];
+
     if (state.books.length === 0) {
-        dom.currentList.textContent = t('noBooks');
-        dom.pastList.textContent = '';
+        updateWithPreservedHeight(dom.pastList, () => {
+            dom.pastList.textContent = t('noBooks');
+        });
         return;
     }
 
     const currentYear = new Date().getFullYear();
+    const years = Array.from(state.booksByYear.keys()).sort((a, b) => b - a);
 
-    Array.from(state.booksByYear.keys())
-        .sort((a, b) => b - a)
-        .forEach(year => {
-            const target = year === currentYear ? dom.currentList : dom.pastList;
-            target.appendChild(createYearSection(year, year === currentYear));
+    updateWithPreservedHeight(dom.pastList, () => {
+        dom.pastList.innerHTML = '';
+        years.forEach(year => {
+            const { fragment, refs } = createYearSection(year, year === currentYear);
+            dom.pastList.appendChild(fragment);
+            state.yearRefs.push(refs);
         });
+        if (!dom.pastList.childElementCount) {
+            dom.pastList.textContent = t('noBooks');
+        }
+    });
+}
 
-    if (!dom.currentList.childElementCount) {
-        dom.currentList.textContent = t('noCurrentBooks');
+function updateBookColumnsLanguage() {
+    if (state.books.length === 0) {
+        dom.pastList.textContent = t('noBooks');
+        return;
     }
 
-    if (!dom.pastList.childElementCount) {
-        dom.pastList.textContent = t('noPastBooks');
+    if (!state.yearRefs.length) {
+        renderBookColumns();
+        return;
     }
+
+    updateWithPreservedHeight(dom.pastList, () => {
+        state.yearRefs.forEach(refs => {
+            const books = state.booksByYear.get(refs.year) || [];
+            refs.heading.textContent = t('yearHeading', refs.year, refs.isCurrentYear);
+            refs.summary.textContent = t('yearSummary', books.length);
+            let lastMonth = null;
+            books.forEach((book, index) => {
+                const monthSpan = refs.monthSpans[index];
+                if (!monthSpan) return;
+                if (lastMonth === book.month) {
+                    monthSpan.textContent = '';
+                } else {
+                    monthSpan.textContent = t('formatMonth', book.month);
+                    lastMonth = book.month;
+                }
+            });
+            refs.badgeSpans.forEach(badge => {
+                badge.el.textContent = t('rereadBadge', badge.count);
+            });
+        });
+    });
 }
 
 function createYearSection(year, isCurrentYear) {
     const fragment = document.createDocumentFragment();
-    fragment.appendChild(createEl('h2', null, t('yearHeading', year, isCurrentYear)));
+    const books = state.booksByYear.get(year) || [];
+    const heading = createEl('h2', null, t('yearHeading', year, isCurrentYear));
+    fragment.appendChild(heading);
+
+    const summary = createEl('p', 'year-summary', t('yearSummary', books.length));
+    fragment.appendChild(summary);
 
     const list = createEl('ul');
+    const monthSpans = [];
+    const badgeSpans = [];
     let lastMonth = null;
-    const books = state.booksByYear.get(year) || [];
-    fragment.appendChild(createEl('p', 'year-summary', t('yearSummary', books.length)));
+
     books.forEach(book => {
         const item = createEl('li');
         const monthSpan = createEl('span', 'month');
@@ -248,20 +289,33 @@ function createYearSection(year, isCurrentYear) {
             monthSpan.textContent = t('formatMonth', book.month);
             lastMonth = book.month;
         }
+        monthSpans.push(monthSpan);
         item.appendChild(monthSpan);
+
         const titleSpan = createEl('span', 'book-title', book.title);
         const count = state.bookCounts.get(book.title);
         const currentDate = book.year * 100 + book.month;
         if (count > 1 && state.latestMonth.get(book.title) === currentDate) {
             const badge = createEl('span', 'reread-badge', t('rereadBadge', count));
             titleSpan.appendChild(badge);
+            badgeSpans.push({ el: badge, count });
         }
         item.appendChild(titleSpan);
         list.appendChild(item);
     });
 
     fragment.appendChild(list);
-    return fragment;
+    return {
+        fragment,
+        refs: {
+            year,
+            isCurrentYear,
+            heading,
+            summary,
+            monthSpans,
+            badgeSpans
+        }
+    };
 }
 
 function monthKey(year, month) {
@@ -331,6 +385,22 @@ function createEl(tag, className, text) {
 function getOrCreate(map, key) {
     if (!map.has(key)) map.set(key, []);
     return map.get(key);
+}
+
+function updateWithPreservedHeight(element, updater) {
+    if (!element || typeof updater !== 'function') return;
+    const previousMinHeight = element.style.minHeight;
+    const currentHeight = element.offsetHeight;
+    if (currentHeight) element.style.minHeight = `${currentHeight}px`;
+    updater();
+    const schedule = window.requestAnimationFrame || (cb => setTimeout(cb, 16));
+    schedule(() => {
+        if (previousMinHeight) {
+            element.style.minHeight = previousMinHeight;
+        } else {
+            element.style.removeProperty('min-height');
+        }
+    });
 }
 
 function createHeatmapHeader(totalCount) {
