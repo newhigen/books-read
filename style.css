@@ -16,6 +16,7 @@ body {
     color: #1f2328;
     width: 40px;
     height: 40px;
+    padding: 0;
     border-radius: 50%;
     font-size: 18px;
     font-weight: 600;
@@ -46,16 +47,23 @@ body {
 }
 
 .heatmap-wrapper {
-    flex: 1 1 320px;
-    min-width: 260px;
-    max-width: 360px;
+    flex: 1 1 360px;
+    min-width: 300px;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 }
 
 .heatmap-controls {
+    width: 100%;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
     margin-bottom: 12px;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .heatmap-controls .control-button {
@@ -77,19 +85,19 @@ body {
 }
 
 .column-card {
-    flex: 1 1 320px;
-    min-width: 260px;
-    max-width: 360px;
+    min-width: 300px;
+    max-width: 420px;
+    width: 100%;
     background: #ffffff;
     border: 1px solid #e1e4e8;
     border-radius: 12px;
     padding: 20px;
+    box-sizing: border-box;
 }
 
 .heatmap-column {
     display: flex;
     flex-direction: column;
-    gap: 12px;
     align-items: center;
 }
 
@@ -180,10 +188,25 @@ body {
     box-sizing: border-box;
 }
 
-.heatmap-cell.level-1 { background: #cfe7ff; border-color: transparent; }
-.heatmap-cell.level-2 { background: #80b9ff; border-color: transparent; }
-.heatmap-cell.level-3 { background: #2f7fff; border-color: transparent; }
-.heatmap-cell.level-4 { background: #0f4da8; border-color: transparent; }
+.heatmap-cell.level-1 {
+    background: #cfe7ff;
+    border-color: transparent;
+}
+
+.heatmap-cell.level-2 {
+    background: #80b9ff;
+    border-color: transparent;
+}
+
+.heatmap-cell.level-3 {
+    background: #2f7fff;
+    border-color: transparent;
+}
+
+.heatmap-cell.level-4 {
+    background: #0f4da8;
+    border-color: transparent;
+}
 
 .heatmap-cell:hover {
     transform: translateY(-2px);
@@ -204,7 +227,7 @@ body {
     border: 1px solid #e1e4e8;
     border-radius: 6px;
     background: #fdfdfd;
-    margin: 16px;
+    margin-top: 16px;
 }
 
 .heatmap-legend {
@@ -228,15 +251,27 @@ body {
     background: #e3efff;
 }
 
-.heatmap-legend-square.level-1 { background: #b3d4ff; }
-.heatmap-legend-square.level-2 { background: #6ba7ff; }
-.heatmap-legend-square.level-3 { background: #2f7fff; }
-.heatmap-legend-square.level-4 { background: #0f4da8; }
+.heatmap-legend-square.level-1 {
+    background: #b3d4ff;
+}
+
+.heatmap-legend-square.level-2 {
+    background: #6ba7ff;
+}
+
+.heatmap-legend-square.level-3 {
+    background: #2f7fff;
+}
+
+.heatmap-legend-square.level-4 {
+    background: #0f4da8;
+}
 
 .books-column {
-    flex: 1 1 320px;
-    min-width: 260px;
-    max-width: 360px;
+    flex: 1 1 360px;
+    min-width: 300px;
+    max-width: 420px;
+    width: 100%;
 }
 
 .books-column h2 {
@@ -344,27 +379,11 @@ body {
     .reading-layout {
         gap: 8px;
     }
-
-    .heatmap-wrapper,
-    .books-column {
-        flex: 1 1 100%;
-        min-width: 0;
-        max-width: 600px;
-    }
 }
 
 @media (max-width: 640px) {
     .reading-layout {
         gap: 6px;
-    }
-
-    .heatmap-controls {
-        flex-direction: column;
-        align-items: flex-end;
-    }
-
-    .heatmap-controls .control-button {
-        width: 40px;
     }
 }
 
