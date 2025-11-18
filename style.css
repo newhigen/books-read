@@ -10,14 +10,7 @@ body {
     color: #24292e;
 }
 
-.page-header {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-#language-toggle {
+.control-button {
     border: 1px solid #d0d7de;
     background: #ffffff;
     color: #1f2328;
@@ -26,28 +19,59 @@ body {
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-#language-toggle:hover {
+.control-button:hover {
     background: #f3f4f6;
 }
 
-#language-toggle[aria-pressed="true"] {
+.control-button[aria-pressed="true"] {
+    background: #1f2328;
+    color: #ffffff;
+    border-color: #1f2328;
+}
+
+.reading-layout {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.heatmap-wrapper {
+    flex: 1 1 360px;
+    min-width: 300px;
+    max-width: 420px;
+}
+
+.heatmap-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.heatmap-controls .control-button {
+    flex: 1;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.column-card {
+    flex: 1 1 360px;
+    min-width: 300px;
+    max-width: 420px;
     background: #ffffff;
-    color: #1f2328;
-    border: 1px solid #d0d7de;
+    border: 1px solid #e1e4e8;
+    border-radius: 12px;
+    padding: 20px;
 }
 
-h1 {
-    margin-bottom: 8px;
-    font-size: 28px;
-}
-
-p#total-books {
-    margin-top: 0;
-    margin-bottom: 24px;
-    color: #586069;
+.heatmap-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
 }
 
 #reading-heatmap {
@@ -55,14 +79,13 @@ p#total-books {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 12px;
 }
 
 .heatmap-header {
     width: 100%;
     text-align: center;
-    margin-bottom: 8px;
     min-height: 64px;
+    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -95,14 +118,6 @@ p#total-books {
     font-size: 14px;
     margin: 0;
     text-align: center;
-}
-
-.reading-layout {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: center;
 }
 
 .heatmap-grid {
@@ -146,25 +161,10 @@ p#total-books {
     box-sizing: border-box;
 }
 
-.heatmap-cell.level-1 {
-    background: #cfe7ff;
-    border-color: transparent;
-}
-
-.heatmap-cell.level-2 {
-    background: #80b9ff;
-    border-color: transparent;
-}
-
-.heatmap-cell.level-3 {
-    background: #2f7fff;
-    border-color: transparent;
-}
-
-.heatmap-cell.level-4 {
-    background: #0f4da8;
-    border-color: transparent;
-}
+.heatmap-cell.level-1 { background: #cfe7ff; border-color: transparent; }
+.heatmap-cell.level-2 { background: #80b9ff; border-color: transparent; }
+.heatmap-cell.level-3 { background: #2f7fff; border-color: transparent; }
+.heatmap-cell.level-4 { background: #0f4da8; border-color: transparent; }
 
 .heatmap-cell:hover {
     transform: translateY(-2px);
@@ -178,15 +178,6 @@ p#total-books {
     margin-left: 6px;
 }
 
-.heatmap-legend {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    align-items: center;
-    font-size: 11px;
-    color: #586069;
-}
-
 .heatmap-legend-wrapper {
     display: inline-flex;
     justify-content: center;
@@ -195,7 +186,14 @@ p#total-books {
     border-radius: 6px;
     background: #fdfdfd;
     margin: 16px;
-    align-self: center;
+}
+
+.heatmap-legend {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 11px;
+    color: #586069;
 }
 
 .heatmap-legend-item {
@@ -211,52 +209,21 @@ p#total-books {
     background: #e3efff;
 }
 
-.heatmap-legend-square.level-1 {
-    background: #b3d4ff;
-}
+.heatmap-legend-square.level-1 { background: #b3d4ff; }
+.heatmap-legend-square.level-2 { background: #6ba7ff; }
+.heatmap-legend-square.level-3 { background: #2f7fff; }
+.heatmap-legend-square.level-4 { background: #0f4da8; }
 
-.heatmap-legend-square.level-2 {
-    background: #6ba7ff;
-}
-
-.heatmap-legend-square.level-3 {
-    background: #2f7fff;
-}
-
-.heatmap-legend-square.level-4 {
-    background: #0f4da8;
-}
-
-.column-card {
+.books-column {
     flex: 1 1 360px;
     min-width: 300px;
     max-width: 420px;
-    background: #fff;
-    border: 1px solid #e1e4e8;
-    border-radius: 12px;
-    padding: 20px;
-    min-height: 200px;
-}
-
-.heatmap-column {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
-    padding-bottom: 0px;
-}
-
-.books-column {
-    flex: 1 1 320px;
-    min-width: 280px;
-    max-width: 360px;
 }
 
 .books-column h2 {
     margin: 0 0 4px;
     font-size: 18px;
     height: 28px;
-    width: 100%;
     display: flex;
     align-items: center;
     white-space: nowrap;
@@ -279,7 +246,6 @@ p#total-books {
     font-size: 12px;
     color: #6a737d;
     height: 20px;
-    width: 100%;
     display: flex;
     align-items: center;
     white-space: nowrap;
@@ -320,7 +286,6 @@ p#total-books {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-left: 0px;
     padding: 0 4px;
     border-radius: 5px;
     border: 1px solid #f0f0f0;
@@ -334,7 +299,7 @@ p#total-books {
 .book-tooltip {
     position: fixed;
     background: #24292e;
-    color: white;
+    color: #ffffff;
     padding: 12px;
     border-radius: 6px;
     font-size: 12px;
@@ -352,43 +317,77 @@ p#total-books {
     margin: 4px 0;
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1100px) {
     body {
         padding: 16px;
     }
 
     .reading-layout {
-        flex-direction: column;
         gap: 8px;
     }
 
-    .column-card {
-        flex: 0 0 100%;
-        max-width: 300px;
-        width: 100%;
+    .heatmap-wrapper,
+    .books-column {
+        flex: 1 1 100%;
         min-width: 0;
-        margin: 0 auto;
+        max-width: 600px;
+    }
+}
+
+@media (max-width: 640px) {
+    .reading-layout {
+        gap: 6px;
     }
 
-    #reading-heatmap {
-        margin-bottom: 6px;
+    .heatmap-controls {
+        flex-direction: column;
     }
 
-    .heatmap-cell {
-        width: 16px;
-        height: 16px;
+    .heatmap-controls .control-button {
+        width: 100%;
     }
+}
 
-    .heatmap-title {
-        font-size: 18px;
-    }
+body.dark-mode {
+    background: #0d1117;
+    color: #e6edf3;
+}
 
-    .heatmap-summary {
-        font-size: 12px;
-    }
+body.dark-mode .column-card {
+    background: #161b22;
+    border-color: #30363d;
+}
 
-    .heatmap-row .year-label {
-        width: 28px;
-        font-size: 11px;
-    }
+body.dark-mode .control-button {
+    background: #1f2328;
+    color: #e6edf3;
+    border-color: #30363d;
+}
+
+body.dark-mode .control-button[aria-pressed="true"] {
+    background: #e6edf3;
+    color: #1f2328;
+    border-color: #e6edf3;
+}
+
+body.dark-mode .heatmap-header,
+body.dark-mode .heatmap-summary,
+body.dark-mode .heatmap-legend,
+body.dark-mode .year-summary,
+body.dark-mode .books-column li span.month {
+    color: #9ea7b3;
+}
+
+body.dark-mode .heatmap-cell {
+    border-color: #30363d;
+}
+
+body.dark-mode .heatmap-legend-wrapper {
+    background: #161b22;
+    border-color: #30363d;
+}
+
+body.dark-mode .book-tooltip {
+    background: #161b22;
+    border: 1px solid #30363d;
 }
