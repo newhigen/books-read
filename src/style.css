@@ -430,3 +430,76 @@ body.dark-mode .book-tooltip {
     background: #161b22;
     border: 1px solid #30363d;
 }
+
+/* Reviews Section */
+.reviews-column {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+}
+
+.reviews-column h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+.review-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.review-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e1e4e8;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.review-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2328;
+    text-decoration: none;
+    line-height: 1.4;
+}
+
+.review-title:hover {
+    color: #0969da;
+    text-decoration: underline;
+}
+
+.review-meta {
+    font-size: 12px;
+    color: #6a737d;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+body.dark-mode .review-item {
+    border-color: #30363d;
+}
+
+body.dark-mode .review-title {
+    color: #e6edf3;
+}
+
+body.dark-mode .review-title:hover {
+    color: #2f81f7;
+}
+
+body.dark-mode .review-meta {
+    color: #8b949e;
+}

@@ -87,10 +87,17 @@ document.addEventListener('DOMContentLoaded', init);
 async function init() {
     initLanguageToggle();
     initThemeToggle();
-    const loaded = await loadBooks();
-    if (!loaded) return;
-    buildDerivedData();
-    renderAll();
+    const [booksLoaded, reviewsLoaded] = await Promise.all([loadBooks(), loadReviews()]);
+
+    if (booksLoaded) {
+        buildDerivedData();
+        renderHeatmap();
+        renderBookColumns();
+    }
+
+    if (reviewsLoaded) {
+        renderReviews();
+    }
 }
 
 function initLanguageToggle() {
@@ -493,3 +500,70 @@ function safeStorageSet(key, value) {
         // ignore failures
     }
 }
+
+/* Review Logic */
+
+const REVIEWS_FILE = 'reviews.json';
+
+async function loadReviews() {
+    try {
+        const response = await fetch(REVIEWS_FILE);
+        if (!response.ok) return false;
+        const reviews = await response.json();
+        state.reviews = reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+function renderReviews() {
+    const container = document.getElementById('recent-reviews');
+    if (!container) return;
+
+    updateWithPreservedHeight(container, () => {
+        container.innerHTML = '';
+        const heading = createEl('h2', null, t('reviewsTitle'));
+        container.appendChild(heading);
+
+        if (!state.reviews || !state.reviews.length) {
+            container.appendChild(createEl('p', 'heatmap-empty', t('noReviews')));
+            return;
+        }
+
+        const list = createEl('ul', 'review-list');
+        state.reviews.forEach(review => {
+            const item = createEl('li', 'review-item');
+
+            const link = createEl('a', 'review-title', review.title);
+            link.href = `reviews/${review.permalink}`;
+            item.appendChild(link);
+
+            const meta = createEl('div', 'review-meta');
+            const dateSpan = createEl('span', null, review.date);
+            meta.appendChild(dateSpan);
+
+            if (review.author) {
+                const authorSpan = createEl('span', null, `· ${review.author}`);
+                meta.appendChild(authorSpan);
+            }
+
+            item.appendChild(meta);
+            list.appendChild(item);
+        });
+        container.appendChild(list);
+    });
+}
+
+// Update TEXT object with review strings
+Object.assign(TEXT.ko, {
+    reviewsTitle: '최근 서평',
+    noReviews: '아직 작성된 서평이 없어요.'
+});
+
+Object.assign(TEXT.en, {
+    reviewsTitle: 'Recent Reviews',
+    noReviews: 'No reviews yet.'
+});
+
+
