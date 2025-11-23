@@ -5,6 +5,7 @@ categories: 책
 author: SUN 도슨트
 permalink: moma-pictures
 publication_year: 2022
+detail: false
 ---
 
 # 책에 대하여

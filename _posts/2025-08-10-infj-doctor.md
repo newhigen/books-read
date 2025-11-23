@@ -5,6 +5,7 @@ categories: 책
 author: 최은경
 permalink: infj-doctor
 publication_year: 2025
+detail: true
 ---
 
 # 소개

@@ -48,6 +48,12 @@ function renderList(container, reviews) {
         const lang = (document.documentElement.lang || 'ko').startsWith('en') ? 'en' : 'ko';
         date.textContent = formatRelativeDate(review.date, lang);
 
+        if (review.detail === true || review.detail === 'true' || review.detail === 'yes') {
+            const badge = document.createElement('span');
+            badge.className = 'review-detail-badge';
+            badge.textContent = 'DETAIL';
+            item.appendChild(badge);
+        }
         item.appendChild(link);
         item.appendChild(date);
         list.appendChild(item);

@@ -5,6 +5,7 @@ categories: 책
 author: 이재영
 permalink: note-premium
 publication_year: 2025
+detail: true
 ---
 
 # 나에게
