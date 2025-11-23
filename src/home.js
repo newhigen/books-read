@@ -1,3 +1,13 @@
+import {
+    parseFrontMatter,
+    deriveTitleFromFilename,
+    deriveDateFromFilename,
+    derivePermalinkFromFilename,
+    formatRelativeDate,
+    extractMarkdownLinks,
+    createEl
+} from './utils.js';
+
 const dom = {
     heatmap: document.getElementById('reading-heatmap'),
     pastList: document.getElementById('past-books'),
@@ -28,15 +38,9 @@ const TEXT = {
         toggleLabel: 'English',
         toggleAriaLabel: '영어로 전환',
         tooltipBullet: '•',
-        relativeToday: '오늘',
-        relativeDay: n => `${n}일 전`,
-        relativeDays: n => `${n}일 전`,
-        relativeWeek: n => `${n}주 전`,
-        relativeWeeks: n => `${n}주 전`,
-        relativeMonth: n => `${n}달 전`,
-        relativeMonths: n => `${n}달 전`,
-        relativeYear: n => `${n}년 전`,
-        relativeYears: n => `${n}년 전`
+        reviewsTitle: '최근 서평',
+        noReviews: '아직 작성된 서평이 없어요.',
+        reviewsListAria: '서평 목록 페이지로 이동'
     },
     en: {
         heatmapTitle: 'Reading Heatmap',
@@ -55,15 +59,9 @@ const TEXT = {
         toggleLabel: '한국어',
         toggleAriaLabel: 'Switch to Korean',
         tooltipBullet: '•',
-        relativeToday: 'Today',
-        relativeDay: n => `${n} day ago`,
-        relativeDays: n => `${n} days ago`,
-        relativeWeek: n => `${n} week ago`,
-        relativeWeeks: n => `${n} weeks ago`,
-        relativeMonth: n => `${n} month ago`,
-        relativeMonths: n => `${n} months ago`,
-        relativeYear: n => `${n} year ago`,
-        relativeYears: n => `${n} years ago`
+        reviewsTitle: 'Recent Reviews',
+        noReviews: 'No reviews yet.',
+        reviewsListAria: 'Go to reviews list page'
     }
 };
 
@@ -362,7 +360,7 @@ function createYearSection(year) {
             : createEl('span', 'book-title-text', displayTitle);
 
         if (review) {
-            titleText.href = review.url || `reviews/${review.permalink}.md`;
+            titleText.href = review.url || `review-detail.html?file=${encodeURIComponent(review.filename)}`;
             titleText.target = '_self';
             titleText.rel = 'noopener';
         }
@@ -468,13 +466,6 @@ function getOrCreate(map, key) {
     return map.get(key);
 }
 
-function createEl(tag, className, text) {
-    const el = document.createElement(tag);
-    if (className) el.className = className;
-    if (text !== undefined && text !== null) el.textContent = text;
-    return el;
-}
-
 function updateWithPreservedHeight(element, updater) {
     if (!element || typeof updater !== 'function') return;
     const previousMinHeight = element.style.minHeight;
@@ -531,52 +522,6 @@ function safeStorageSet(key, value) {
     }
 }
 
-function formatRelativeDate(value) {
-    if (!value) return '';
-    const parsed = parseDate(value);
-    if (!parsed) return value;
-
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const target = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
-    const diffMs = startOfToday - target;
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffDays <= 0) return t('relativeToday');
-    if (diffDays < 7) {
-        return diffDays === 1 ? t('relativeDay', 1) : t('relativeDays', diffDays);
-    }
-
-    const weeks = Math.floor(diffDays / 7);
-    if (weeks < 4) {
-        return weeks === 1 ? t('relativeWeek', 1) : t('relativeWeeks', weeks);
-    }
-
-    const months = Math.floor(diffDays / 30);
-    if (months < 12) {
-        return months === 1 ? t('relativeMonth', 1) : t('relativeMonths', months);
-    }
-
-    const years = Math.floor(diffDays / 365);
-    return years === 1 ? t('relativeYear', 1) : t('relativeYears', years);
-}
-
-function parseDate(value) {
-    const cleaned = String(value).trim();
-    const isoCandidate = cleaned.replace(/\./g, '-').replace(/\//g, '-');
-    const direct = new Date(isoCandidate);
-    if (!Number.isNaN(direct.getTime())) return direct;
-
-    if (/^\d{8}$/.test(cleaned)) {
-        const y = cleaned.slice(0, 4);
-        const m = cleaned.slice(4, 6);
-        const d = cleaned.slice(6, 8);
-        const alt = new Date(`${y}-${m}-${d}`);
-        if (!Number.isNaN(alt.getTime())) return alt;
-    }
-    return null;
-}
-
 /* Review Logic */
 
 async function loadReviews() {
@@ -627,30 +572,6 @@ async function discoverReviewFiles() {
     }
 }
 
-function extractMarkdownLinks(html) {
-    const files = [];
-    try {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        doc.querySelectorAll('a[href]').forEach(a => {
-            const href = a.getAttribute('href') || '';
-            if (/\.md$/i.test(href)) files.push(href.split('/').pop());
-        });
-    } catch {
-        // ignore DOM parse issues
-    }
-
-    if (!files.length) {
-        const regex = /href="([^"]+\.md)"/gi;
-        let match;
-        while ((match = regex.exec(html))) {
-            files.push(match[1].split('/').pop());
-        }
-    }
-
-    return files;
-}
-
 async function fetchReviewMetadata(filename) {
     if (!filename) return null;
     try {
@@ -667,36 +588,13 @@ async function fetchReviewMetadata(filename) {
             author: frontmatter.author || '',
             date,
             permalink,
-            url: `review.html?file=${encodeURIComponent(filename)}`,
+            filename,
+            url: `review-detail.html?file=${encodeURIComponent(filename)}`,
             publicationYear: frontmatter.publication_year ?? frontmatter.publicationYear
         };
     } catch {
         return null;
     }
-}
-
-function parseFrontMatter(text) {
-    const match = text.match(/^---\n([\s\S]*?)\n---/);
-    if (!match) return {};
-    return match[1].split('\n').reduce((acc, line) => {
-        const separatorIndex = line.indexOf(':');
-        if (separatorIndex === -1) return acc;
-        const key = line.slice(0, separatorIndex).trim();
-        if (!key) return acc;
-        const rawValue = line.slice(separatorIndex + 1).trim();
-        const value = rawValue.replace(/^['"]|['"]$/g, '');
-        acc[key] = value;
-        return acc;
-    }, {});
-}
-
-function derivePermalinkFromFilename(filename) {
-    return filename.replace(/\.md$/i, '').split('_').slice(1).join('_') || filename.replace(/\.md$/i, '');
-}
-
-function deriveDateFromFilename(filename) {
-    const token = filename.split('_')[0] || '';
-    return token.replace(/[^0-9-]/g, '');
 }
 
 function renderReviews() {
@@ -707,7 +605,7 @@ function renderReviews() {
         container.innerHTML = '';
         const header = createEl('div', 'reviews-header');
         const headingLink = createEl('a', 'reviews-title-link', t('reviewsTitle'));
-        headingLink.href = 'reviews.html';
+        headingLink.href = 'review-list.html';
         const heading = createEl('h2');
         heading.appendChild(headingLink);
         header.appendChild(heading);
@@ -725,26 +623,13 @@ function renderReviews() {
             const item = createEl('li', 'review-item');
 
             const link = createEl('a', 'review-title', review.title);
-            link.href = review.url || `reviews/${review.permalink}.md`;
+            link.href = review.url || `review-detail.html?file=${encodeURIComponent(review.filename)}`;
             item.appendChild(link);
 
-            const dateSpan = createEl('span', 'review-date', formatRelativeDate(review.date));
+            const dateSpan = createEl('span', 'review-date', formatRelativeDate(review.date, state.language));
             item.appendChild(dateSpan);
             list.appendChild(item);
         });
         container.appendChild(list);
     });
 }
-
-// Update TEXT object with review strings
-Object.assign(TEXT.ko, {
-    reviewsTitle: '최근 서평',
-    noReviews: '아직 작성된 서평이 없어요.',
-    reviewsListAria: '서평 목록 페이지로 이동'
-});
-
-Object.assign(TEXT.en, {
-    reviewsTitle: 'Recent Reviews',
-    noReviews: 'No reviews yet.',
-    reviewsListAria: 'Go to reviews list page'
-});
