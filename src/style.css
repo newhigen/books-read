@@ -427,6 +427,40 @@ body {
     margin-top: 16px;
 }
 
+@media (max-width: 640px) {
+    .review-container {
+        padding: 16px;
+    }
+
+    .review-header h1 {
+        font-size: 22px;
+    }
+
+    .review-meta,
+    .review-date,
+    .review-content {
+        font-size: 14px;
+    }
+
+    .review-content h1 {
+        font-size: 22px;
+    }
+
+    .review-content h2 {
+        font-size: 18px;
+    }
+
+    .review-content h3 {
+        font-size: 16px;
+    }
+
+    .review-content h4,
+    .review-content h5,
+    .review-content h6 {
+        font-size: 14px;
+    }
+}
+
 .books-column {
     flex: 1 1 360px;
     min-width: 360px;
@@ -711,6 +745,61 @@ body.dark-mode .book-tooltip {
     white-space: nowrap;
 }
 
+@media (max-width: 480px) {
+    .review-page {
+        padding: 6px;
+    }
+
+    .review-container {
+        padding: 14px;
+    }
+
+    .review-header h1 {
+        font-size: 18px;
+    }
+
+    .review-meta,
+    .review-date {
+        font-size: 11px;
+    }
+
+    .review-content h1 {
+        font-size: 18px;
+    }
+
+    .review-content h2 {
+        font-size: 16px;
+    }
+
+    .review-content h3 {
+        font-size: 14px;
+    }
+
+    .review-content h4 {
+        font-size: 12px;
+    }
+
+    .review-content h5 {
+        font-size: 10px;
+    }
+
+    .review-content h6 {
+        font-size: 8px;
+    }
+
+    .review-content p {
+        font-size: 11px;
+    }
+
+    .review-content ul {
+        font-size: 11px;
+    }
+
+    .review-content blockquote {
+        font-size: 11px;
+    }
+}
+
 /* Reviews list page */
 .reviews-page {
     padding: 16px;
@@ -779,8 +868,7 @@ body.dark-mode .book-tooltip {
     padding: 6px 0;
 }
 
-.reviews-archive-item:last-child {
-}
+.reviews-archive-item:last-child {}
 
 body.dark-mode .review-item {
     border-color: #30363d;
