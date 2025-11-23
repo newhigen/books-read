@@ -91,6 +91,7 @@ function markdownToHtml(markdown) {
     let inCode = false;
     let codeLines = [];
     let listBuffer = [];
+    let currentListType = null;
 
     const flushCode = () => {
         if (!inCode) return;
@@ -101,9 +102,11 @@ function markdownToHtml(markdown) {
 
     const flushList = () => {
         if (!listBuffer.length) return;
+        const tag = currentListType === 'ol' ? 'ol' : 'ul';
         const items = listBuffer.map(item => `<li>${item}</li>`).join('');
-        html.push(`<ul>${items}</ul>`);
+        html.push(`<${tag}>${items}</${tag}>`);
         listBuffer = [];
+        currentListType = null;
     };
 
     cleanLines.forEach(rawLine => {
@@ -131,15 +134,23 @@ function markdownToHtml(markdown) {
             return;
         }
 
-        const listMatch = line.match(/^[-*+]\s+(.*)$/);
-        if (listMatch) {
-            listBuffer.push(inlineMarkdown(listMatch[1]));
+        const unorderedMatch = line.match(/^[-*+]\s+(.*)$/);
+        const orderedMatch = line.match(/^\d+\.\s+(.*)$/);
+        if (unorderedMatch || orderedMatch) {
+            const listType = orderedMatch ? 'ol' : 'ul';
+            const content = inlineMarkdown((orderedMatch || unorderedMatch)[1]);
+            if (currentListType && currentListType !== listType) {
+                flushList();
+            }
+            currentListType = listType;
+            listBuffer.push(content);
             return;
         } else {
             flushList();
         }
 
         if (!line.trim()) {
+            flushList();
             return;
         }
 
@@ -172,7 +183,7 @@ function inlineMarkdown(text) {
 
     // Custom escaping: /< -> <, /> -> >
     result = result.replace(/\/&lt;/g, '<').replace(/\/&gt;/g, '>');
-
+    
     // Footnote references: [^n] -> n (superscript)
     result = result.replace(/\[\^(.+?)\]/g, '<sup><a href="#fn-$1" id="ref-$1">$1</a></sup>');
 

@@ -389,20 +389,30 @@ body {
 
 .review-content p {
     line-height: 1.6;
-    margin: 10px 0;
+    margin: 8px 0;
 }
 
 .review-content blockquote {
-    margin: 12px 0;
+    margin: 10px 0;
     padding: 8px 16px;
     border-left: 4px solid #d0d7de;
     background: #f6f8fa;
     color: #24292e;
 }
 
-.review-content ul {
-    line-height: 1.6;
-    margin: 10px 0 10px 0;
+.review-content ul,
+.review-content ol {
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 8px 0 8px 0;
+    padding-left: 18px;
+}
+
+.review-content ul li,
+.review-content ol li {
+    font-size: 15px;
+    margin: 4px 0;
+    line-height: 1.4;
 }
 
 .review-content pre {
@@ -918,6 +928,16 @@ body.dark-mode .review-content a:hover {
     }
 
     .review-content blockquote {
+        font-size: 11px;
+    }
+
+    .review-content ul,
+    .review-content ol {
+        font-size: 11px;
+    }
+
+    .review-content ul li,
+    .review-content ol li {
         font-size: 11px;
     }
 

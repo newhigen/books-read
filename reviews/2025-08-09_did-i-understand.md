@@ -1,6 +1,6 @@
 ---
 title: 안다는 착각
-date: 2025-08-09  
+date: 2025-08-09
 author: 니시바야시 가츠히코
 permalink: did-i-understand
 publication_year: 2005
@@ -29,6 +29,7 @@ publication_year: 2005
 1. 관련 짓지 못하면 ‘모르는’ 상태
 2. 관련 짓는 다면 ‘아는’ 상태
 3. 긴밀하게 관련 지어지면 ‘더 잘 아는’ 상태
+
 * 단서를 활용: (1) 글 밖 지식, (2) 직접 만든 가정
 
 <img src="./assets/hint.jpg" alt="단서" width="200" />
@@ -39,7 +40,7 @@ publication_year: 2005
 
 * 배경은 time-dependency ↓, 상황은 time-dependency ↑
 
-<img src="./assets/context.jpg" alt="문맥" width="250"/>
+<img src="./assets/context.jpg" alt="문맥" width="200"/>
 
 문맥에서 의미를 끌어냄 즉 적혀있지 않는 내용도 더 잘 이해함
 
@@ -126,7 +127,7 @@ A. 1) 더 나아가려는 탐구 활동을 방해한다. 2) 내버려두면 나�
 3. 새 의미 → 모순, 무관련 = ‘모르는 상태’
 4. 새 모순 없는 관련 → ‘더 잘 아는 상태’ ⇒ 새로운 모르는 상태
 
-# 4. 정답 vs. 해석의 자유? 정합성\!
+# 4. 정답 vs. 해석의 자유? 정합성!
 
 ## 정합성
 
