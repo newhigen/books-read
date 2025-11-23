@@ -1,6 +1,6 @@
 ---
 title: 실용주의 사고와 학습
-date: 2025-08-17
+date: 2025-11-15
 categories: 책
 author: 앤디 헌트
 permalink: pragmatic-thinking

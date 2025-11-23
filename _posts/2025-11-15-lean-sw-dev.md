@@ -1,6 +1,6 @@
 ---
 title: 린 소프트웨어 개발
-date: 2025-08-17
+date: 2025-11-15
 categories: 책
 author: 메리 포펜딕, 톰 포펜딕
 permalink: lean-sw-dev

@@ -43,5 +43,5 @@ detail: true # 정독 후기면 true, 아니면 생략/false
 본문을 Markdown으로 작성하세요. 중첩 리스트, 코드 블록, 이미지(`assets/` 경로) 등을 지원합니다.
 ```
 
-- 목록: `/books/reviews`에서 후기 목록을 확인하고, 개별 파일은 퍼머링크(`/slug`)로 이동합니다.
+- 목록: `/books/reviews/`에서 후기 목록을 확인하고, 개별 파일은 퍼머링크(`/slug`)로 이동합니다.
 - 후기 데이터는 빌드 시 Jekyll이 `src/reviews-data.js`(전역 `window.REVIEWS`)를 자동 생성합니다.
