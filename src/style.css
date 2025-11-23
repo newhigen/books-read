@@ -379,7 +379,7 @@ body {
 }
 
 .review-content ul {
-    margin: 10px 0 10px 20px;
+    margin: 10px 0 10px 0;
 }
 
 .review-content pre {
@@ -399,6 +399,12 @@ body {
 .review-footer {
     margin-top: 20px;
     text-align: right;
+}
+
+.review-divider {
+    border: none;
+    border-top: 1px solid #e1e4e8;
+    margin: 12px 0 16px;
 }
 
 .review-error {

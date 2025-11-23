@@ -56,10 +56,11 @@ function parseFrontMatter(block) {
 
 function renderHeader(meta, filename) {
     const title = meta.title || deriveTitleFromFilename(filename);
-    const date = meta.date || deriveDateFromFilename(filename);
+    const rawDate = meta.date || deriveDateFromFilename(filename);
+    const formattedDate = formatDate(rawDate);
     document.title = title;
     setText('review-title', title);
-    setText('review-date', date);
+    setText('review-date', formattedDate);
     const metaParts = [];
     if (meta.author) metaParts.push(meta.author);
     const publicationYear = meta.publication_year || meta.publicationYear;
@@ -74,6 +75,22 @@ function deriveTitleFromFilename(filename) {
 function deriveDateFromFilename(filename) {
     const token = filename.split('_')[0] || '';
     return token.replace(/[^0-9-]/g, '');
+}
+
+function formatDate(raw) {
+    if (!raw) return '';
+    const parts = raw.split(/[-./]/).filter(Boolean);
+    if (parts.length === 3) {
+        const [y, m, d] = parts;
+        return `${y}년 ${m.padStart(2, '0')}월 ${d.padStart(2, '0')}일`;
+    }
+    if (raw.length === 8) {
+        const y = raw.slice(0, 4);
+        const m = raw.slice(4, 6);
+        const d = raw.slice(6, 8);
+        return `${y}년 ${m}월 ${d}일`;
+    }
+    return raw;
 }
 
 function renderContent(markdown) {
