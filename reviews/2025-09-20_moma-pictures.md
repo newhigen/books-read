@@ -1,5 +1,4 @@
 ---
-layout: post
 title: 그림들
 date: 2025-09-19
 categories: 책

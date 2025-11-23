@@ -1,5 +1,4 @@
 ---
-layout: post
 title: 달리기를 말할 때 내가 하고 싶은 이야기
 date: 2025-08-12
 categories: 책

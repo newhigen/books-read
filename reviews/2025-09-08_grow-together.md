@@ -1,5 +1,4 @@
 ---
-layout: post
 title: 함께 자라기
 date: 2025-09-08
 categories: 책

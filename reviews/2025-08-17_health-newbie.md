@@ -1,5 +1,4 @@
 ---
-layout: post
 title: 헬스는 쪼렙입니다만
 date: 2025-08-17
 categories: 책

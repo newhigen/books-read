@@ -1,5 +1,4 @@
 ---
-layout: post
 title: 디테일의 발견
 date: 2025-09-19
 categories: 책

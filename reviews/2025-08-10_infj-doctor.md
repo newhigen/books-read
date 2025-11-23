@@ -1,5 +1,4 @@
 ---
-layout: post
 title: INFJ 의사의 병원 일기
 date: 2025-08-10
 categories: 책

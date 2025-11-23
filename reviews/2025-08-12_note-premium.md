@@ -1,5 +1,4 @@
 ---
-layout: post
 title: 노트의 품격
 date: 2025-08-12
 categories: 책
