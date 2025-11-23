@@ -419,6 +419,16 @@ body {
     border-radius: 4px;
 }
 
+.review-content img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 16px auto;
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
 .review-content a {
     color: #0f4da8;
     text-decoration-color: rgba(15, 77, 168, 0.35);
@@ -725,6 +735,11 @@ body.dark-mode .review-content code {
 }
 
 body.dark-mode .review-content pre {
+    background: #161b22;
+}
+
+body.dark-mode .review-content img {
+    border-color: #30363d;
     background: #161b22;
 }
 

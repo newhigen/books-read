@@ -1,10 +1,10 @@
 import {
-    parseFrontMatter,
-    deriveTitleFromFilename,
     deriveDateFromFilename,
-    formatDate,
+    deriveTitleFromFilename,
     escapeHtml,
-    initTheme
+    formatDate,
+    initTheme,
+    parseFrontMatter
 } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', initReviewPage);
@@ -170,14 +170,8 @@ function markdownToHtml(markdown) {
 function inlineMarkdown(text) {
     let result = text;
 
-    // Allow raw <img> tags: unescape them
-    result = result.replace(/&lt;img (.*?)&gt;/g, '<img $1>');
-
     // Custom escaping: /< -> <, /> -> >
     result = result.replace(/\/&lt;/g, '<').replace(/\/&gt;/g, '>');
-
-    // Images: ![alt](url)
-    result = result.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
 
     // Footnote references: [^n] -> n (superscript)
     result = result.replace(/\[\^(.+?)\]/g, '<sup><a href="#fn-$1" id="ref-$1">$1</a></sup>');
