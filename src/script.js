@@ -676,11 +676,6 @@ function renderReviews() {
         const heading = createEl('h2');
         heading.appendChild(headingLink);
         header.appendChild(heading);
-
-        const listButton = createEl('a', 'reviews-button', '→');
-        listButton.href = 'reviews.html';
-        listButton.setAttribute('aria-label', t('reviewsListAria'));
-        header.appendChild(listButton);
         container.appendChild(header);
 
         const reviewsToShow = (state.reviews || []).slice(0, 3);
