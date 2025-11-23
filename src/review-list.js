@@ -5,12 +5,14 @@ import {
     derivePermalinkFromFilename,
     formatRelativeDate,
     extractMarkdownLinks,
-    createEl
+    createEl,
+    initTheme
 } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', initReviewsList);
 
 async function initReviewsList() {
+    initTheme('theme-toggle');
     const container = document.getElementById('reviews-list');
     if (!container) return;
 

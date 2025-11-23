@@ -3,12 +3,14 @@ import {
     deriveTitleFromFilename,
     deriveDateFromFilename,
     formatDate,
-    escapeHtml
+    escapeHtml,
+    initTheme
 } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', initReviewPage);
 
 async function initReviewPage() {
+    initTheme('theme-toggle');
     const params = new URLSearchParams(window.location.search);
     const filename = params.get('file');
     if (!filename) {

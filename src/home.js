@@ -5,7 +5,8 @@ import {
     derivePermalinkFromFilename,
     formatRelativeDate,
     extractMarkdownLinks,
-    createEl
+    createEl,
+    initTheme
 } from './utils.js';
 
 const dom = {
@@ -65,24 +66,11 @@ const TEXT = {
     }
 };
 
-const THEME_STORAGE_KEY = 'book-tracker-theme';
-const THEME_COPY = {
-    light: {
-        icon: '☀️',
-        aria: 'Switch to dark mode'
-    },
-    dark: {
-        icon: '🌙',
-        aria: 'Switch to light mode'
-    }
-};
-
 const state = {
     books: [],
     booksByYear: new Map(),
     heatmapBuckets: new Map(),
     language: 'ko',
-    theme: 'light',
     yearRefs: [],
     reviews: [],
     reviewLookup: new Map()
@@ -104,7 +92,8 @@ document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     initLanguageToggle();
-    initThemeToggle();
+    initLanguageToggle();
+    initTheme('theme-toggle');
     const [booksLoaded] = await Promise.all([loadBooks(), loadReviews()]);
 
     if (booksLoaded) {
@@ -480,46 +469,6 @@ function updateWithPreservedHeight(element, updater) {
             element.style.removeProperty('min-height');
         }
     });
-}
-function initThemeToggle() {
-    if (!dom.themeToggle) return;
-    const stored = safeStorageGet(THEME_STORAGE_KEY);
-    if (stored === 'dark' || stored === 'light') state.theme = stored;
-    applyTheme();
-    dom.themeToggle.addEventListener('click', () => {
-        state.theme = state.theme === 'dark' ? 'light' : 'dark';
-        applyTheme();
-    });
-}
-
-function applyTheme() {
-    document.body.classList.toggle('dark-mode', state.theme === 'dark');
-    safeStorageSet(THEME_STORAGE_KEY, state.theme);
-    updateThemeToggleUI();
-}
-
-function updateThemeToggleUI() {
-    if (!dom.themeToggle) return;
-    const copy = state.theme === 'dark' ? THEME_COPY.dark : THEME_COPY.light;
-    dom.themeToggle.textContent = copy.icon;
-    dom.themeToggle.setAttribute('aria-label', copy.aria);
-    dom.themeToggle.setAttribute('aria-pressed', state.theme === 'dark');
-}
-
-function safeStorageGet(key) {
-    try {
-        return localStorage.getItem(key);
-    } catch {
-        return null;
-    }
-}
-
-function safeStorageSet(key, value) {
-    try {
-        localStorage.setItem(key, value);
-    } catch {
-        // ignore failures
-    }
 }
 
 /* Review Logic */

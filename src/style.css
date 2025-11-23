@@ -292,14 +292,14 @@ body {
     margin-bottom: 24px;
 }
 
-.review-nav-buttons {
+.review-nav-buttons,
+.reviews-nav-buttons {
     display: flex;
     gap: 12px;
     justify-content: flex-start;
 }
 
-.nav-button,
-.reviews-home-button {
+.nav-button {
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -313,21 +313,19 @@ body {
     transition: background 0.2s ease, transform 0.2s ease;
     background: transparent;
     padding: 0;
+    font-size: 18px;
 }
 
-.nav-button svg,
-.reviews-home-button svg {
+.nav-button svg {
     display: block;
 }
 
-.nav-button:hover,
-.reviews-home-button:hover {
+.nav-button:hover {
     background: #e8eaed;
     transform: translateY(-1px);
 }
 
-.nav-button:active,
-.reviews-home-button:active {
+.nav-button:active {
     transform: translateY(0);
 }
 
@@ -660,6 +658,70 @@ body.dark-mode .heatmap-legend-wrapper {
 body.dark-mode .book-tooltip {
     background: #161b22;
     border: 1px solid #30363d;
+}
+
+body.dark-mode .reviews-list-container,
+body.dark-mode .review-container {
+    background: #161b22;
+    border-color: #30363d;
+}
+
+body.dark-mode .nav-button {
+    background: #0f172a;
+    border-color: #4b5563;
+    color: #e6edf3;
+}
+
+body.dark-mode .nav-button:hover {
+    background: #1e293b;
+}
+
+body.dark-mode .review-title {
+    color: #e6edf3;
+}
+
+body.dark-mode .review-title:hover {
+    color: #2f81f7;
+}
+
+body.dark-mode .review-meta,
+body.dark-mode .review-date {
+    color: #8b949e;
+}
+
+body.dark-mode .review-content {
+    color: #e6edf3;
+}
+
+body.dark-mode .review-content h1,
+body.dark-mode .review-content h2,
+body.dark-mode .review-content h3,
+body.dark-mode .review-content h4,
+body.dark-mode .review-content h5,
+body.dark-mode .review-content h6 {
+    color: #e6edf3;
+}
+
+body.dark-mode .review-content blockquote {
+    background: #161b22;
+    border-color: #30363d;
+    color: #8b949e;
+}
+
+body.dark-mode .review-content code {
+    background: #161b22;
+}
+
+body.dark-mode .review-content pre {
+    background: #161b22;
+}
+
+body.dark-mode .review-divider {
+    border-top-color: #30363d;
+}
+
+body.dark-mode .book-title {
+    color: #e6edf3;
 }
 
 /* Reviews Section */

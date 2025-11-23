@@ -133,6 +133,77 @@ export function formatRelativeDate(value, lang = 'ko') {
     return copy.year(years);
 }
 
+/* Theme Logic */
+const THEME_STORAGE_KEY = 'book-tracker-theme';
+const THEME_COPY = {
+    light: {
+        icon: '☀️',
+        aria: 'Switch to dark mode'
+    },
+    dark: {
+        icon: '🌙',
+        aria: 'Switch to light mode'
+    }
+};
+
+let currentTheme = 'light';
+
+export function initTheme(toggleBtnId) {
+    const toggleBtn = document.getElementById(toggleBtnId);
+    if (!toggleBtn) return;
+
+    const stored = safeStorageGet(THEME_STORAGE_KEY);
+    if (stored === 'dark' || stored === 'light') {
+        currentTheme = stored;
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        currentTheme = 'dark';
+    }
+
+    applyTheme(toggleBtn);
+
+    toggleBtn.addEventListener('click', () => {
+        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(toggleBtn);
+    });
+}
+
+export function toggleTheme(toggleBtnId) {
+    const toggleBtn = document.getElementById(toggleBtnId);
+    if (!toggleBtn) return;
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(toggleBtn);
+}
+
+export function applyTheme(toggleBtn) {
+    document.body.classList.toggle('dark-mode', currentTheme === 'dark');
+    safeStorageSet(THEME_STORAGE_KEY, currentTheme);
+    updateThemeUI(toggleBtn);
+}
+
+export function updateThemeUI(toggleBtn) {
+    if (!toggleBtn) return;
+    const copy = currentTheme === 'dark' ? THEME_COPY.dark : THEME_COPY.light;
+    toggleBtn.textContent = copy.icon;
+    toggleBtn.setAttribute('aria-label', copy.aria);
+    toggleBtn.setAttribute('aria-pressed', currentTheme === 'dark');
+}
+
+function safeStorageGet(key) {
+    try {
+        return localStorage.getItem(key);
+    } catch {
+        return null;
+    }
+}
+
+function safeStorageSet(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    } catch {
+        // ignore failures
+    }
+}
+
 export function extractMarkdownLinks(html) {
     const files = [];
     try {
