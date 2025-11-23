@@ -5,6 +5,7 @@ categories: 책
 author: 생각노트
 permalink: discovery-of-detail
 publication_year: 2023
+detail: true
 ---
 
 # 책에 대한 생각

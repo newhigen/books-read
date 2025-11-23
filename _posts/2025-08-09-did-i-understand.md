@@ -4,6 +4,7 @@ date: 2025-08-09
 author: 니시바야시 가츠히코
 permalink: did-i-understand
 publication_year: 2005
+detail: true
 ---
 
 # 소개

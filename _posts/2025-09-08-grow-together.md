@@ -5,6 +5,7 @@ categories: 책
 author: 김창준
 permalink: grow-together
 publication_year: 2018
+detail: true
 ---
 
 # 소개

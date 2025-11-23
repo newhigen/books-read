@@ -5,6 +5,7 @@ categories: 책
 author: 수피
 permalink: health-newbie
 publication_year: 2023
+detail: false
 ---
 
 # 소개
