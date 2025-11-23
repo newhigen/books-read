@@ -86,7 +86,8 @@ const state = {
     language: 'ko',
     theme: 'light',
     yearRefs: [],
-    reviews: []
+    reviews: [],
+    reviewLookup: new Map()
 };
 
 const normalizeText = value => (value ?? '').trim();
@@ -353,16 +354,28 @@ function createYearSection(year) {
         item.appendChild(monthSpan);
 
         const displayTitle = getLocalizedTitle(book);
-        const titleSpan = createEl('span', 'book-title', displayTitle);
+        const review = findReviewForBook(book);
+        const titleContainer = createEl('span', 'book-title');
+
+        const titleText = review
+            ? createEl('a', 'book-title-text review-link has-review', displayTitle)
+            : createEl('span', 'book-title-text', displayTitle);
+
+        if (review) {
+            titleText.href = review.url || `reviews/${review.permalink}.md`;
+            titleText.target = '_self';
+            titleText.rel = 'noopener';
+        }
+        titleContainer.appendChild(titleText);
         const canonical = book.canonicalTitle || getCanonicalTitle(book);
         const count = state.bookCounts.get(canonical) || 0;
         const snapshot = book.year * 100 + book.month;
         if (count > 1 && state.latestMonth.get(canonical) === snapshot) {
             const badge = createEl('span', 'reread-badge', t('rereadBadge', count));
-            titleSpan.appendChild(badge);
+            titleContainer.appendChild(badge);
             badgeSpans.push({ el: badge, count });
         }
-        item.appendChild(titleSpan);
+        item.appendChild(titleContainer);
         list.appendChild(item);
     });
 
@@ -570,14 +583,36 @@ async function loadReviews() {
     const files = await discoverReviewFiles();
     if (!files.length) {
         state.reviews = [];
+        state.reviewLookup = new Map();
         return false;
     }
 
     const metadata = await Promise.all(files.map(fetchReviewMetadata));
-    state.reviews = metadata
-        .filter(Boolean)
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    state.reviews = metadata.filter(Boolean).sort((a, b) => new Date(b.date) - new Date(a.date));
+    buildReviewLookup(state.reviews);
     return true;
+}
+
+function findReviewForBook(book) {
+    const candidates = [
+        normalizeText(book.title),
+        normalizeText(book.englishTitle),
+        getCanonicalTitle(book)
+    ]
+        .map(v => v.toLowerCase())
+        .filter(Boolean);
+    for (const key of candidates) {
+        if (state.reviewLookup.has(key)) return state.reviewLookup.get(key);
+    }
+    return null;
+}
+
+function buildReviewLookup(reviews) {
+    state.reviewLookup = new Map();
+    reviews.forEach(review => {
+        const normalizedTitle = normalizeText(review.title).toLowerCase();
+        if (normalizedTitle) state.reviewLookup.set(normalizedTitle, review);
+    });
 }
 
 async function discoverReviewFiles() {
