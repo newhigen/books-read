@@ -54,6 +54,22 @@
     <article class="review-content markdown-body">
       {{ content }}
     </article>
+    {%- assign weekday_number = page.date | date: "%w" -%}
+    {%- case weekday_number -%}
+      {%- when "0" -%}{% assign weekday_ko = "일" %}
+      {%- when "1" -%}{% assign weekday_ko = "월" %}
+      {%- when "2" -%}{% assign weekday_ko = "화" %}
+      {%- when "3" -%}{% assign weekday_ko = "수" %}
+      {%- when "4" -%}{% assign weekday_ko = "목" %}
+      {%- when "5" -%}{% assign weekday_ko = "금" %}
+      {%- when "6" -%}{% assign weekday_ko = "토" %}
+    {%- endcase -%}
+
+    <div class="review-footer">
+      <span class="review-date">
+        {{ page.date | date: "%Y년 %-m월 %-d일" }} ({{ weekday_ko }})
+      </span>
+    </div>
   </main>
 </body>
 
