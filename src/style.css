@@ -317,9 +317,13 @@ body {
     transform: translateY(0);
 }
 
+.review-header {
+    text-align: center;
+}
+
 .review-header h1 {
     margin: 8px 0 12px;
-    font-size: 24px;
+    font-size: 26px;
 }
 
 .review-date {
@@ -331,7 +335,12 @@ body {
 .review-meta {
     margin: 0 0 12px;
     color: #6a737d;
-    font-size: 14px;
+    font-size: 15px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .review-content h1,
@@ -379,6 +388,7 @@ body {
 }
 
 .review-content ul {
+    line-height: 1.6;
     margin: 10px 0 10px 0;
 }
 

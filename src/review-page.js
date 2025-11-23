@@ -79,16 +79,31 @@ function deriveDateFromFilename(filename) {
 
 function formatDate(raw) {
     if (!raw) return '';
+    const stripZero = value => {
+        const num = parseInt(value, 10);
+        return Number.isFinite(num) ? String(num) : value;
+    };
+    const dayName = date => ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+
+    const buildDateString = (y, m, d) => {
+        const year = stripZero(y);
+        const month = stripZero(m);
+        const day = stripZero(d);
+        const dateObj = new Date(`${year}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`);
+        const weekday = Number.isNaN(dateObj.getTime()) ? '' : ` (${dayName(dateObj)})`;
+        return `${year}년 ${month}월 ${day}일${weekday}`;
+    };
+
     const parts = raw.split(/[-./]/).filter(Boolean);
     if (parts.length === 3) {
         const [y, m, d] = parts;
-        return `${y}년 ${m.padStart(2, '0')}월 ${d.padStart(2, '0')}일`;
+        return buildDateString(y, m, d);
     }
     if (raw.length === 8) {
         const y = raw.slice(0, 4);
         const m = raw.slice(4, 6);
         const d = raw.slice(6, 8);
-        return `${y}년 ${m}월 ${d}일`;
+        return buildDateString(y, m, d);
     }
     return raw;
 }
