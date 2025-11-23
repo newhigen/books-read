@@ -531,6 +531,12 @@ function renderReviews() {
             link.href = review.url || `review-detail.html?file=${encodeURIComponent(review.filename)}`;
             item.appendChild(link);
 
+            const isDetail = review.detail === true || review.detail === 'true' || review.detail === 'yes';
+            if (!isDetail) {
+                const badge = createEl('span', 'review-short-badge', 'Short');
+                item.appendChild(badge);
+            }
+
             const dateSpan = createEl('span', 'review-date', formatRelativeDate(review.date, state.language));
             item.appendChild(dateSpan);
             list.appendChild(item);

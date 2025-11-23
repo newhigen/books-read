@@ -1,4 +1,4 @@
-import { formatRelativeDate, createEl, initTheme } from './utils.js';
+import { createEl, formatRelativeDate, initTheme } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', initReviewsList);
 
@@ -48,13 +48,14 @@ function renderList(container, reviews) {
         const lang = (document.documentElement.lang || 'ko').startsWith('en') ? 'en' : 'ko';
         date.textContent = formatRelativeDate(review.date, lang);
 
-        if (review.detail === true || review.detail === 'true' || review.detail === 'yes') {
+        item.appendChild(link);
+        const isDetail = review.detail === true || review.detail === 'true' || review.detail === 'yes';
+        if (!isDetail) {
             const badge = document.createElement('span');
-            badge.className = 'review-detail-badge';
-            badge.textContent = 'DETAIL';
+            badge.className = 'review-short-badge';
+            badge.textContent = 'Short';
             item.appendChild(badge);
         }
-        item.appendChild(link);
         item.appendChild(date);
         list.appendChild(item);
     });

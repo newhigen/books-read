@@ -5,7 +5,7 @@ categories: 책
 author: 무라카미 하루키
 permalink: running-story
 publication_year: 2008
-detail: false
+detail: true
 ---
 
 # 나에게는
