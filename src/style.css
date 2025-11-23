@@ -912,13 +912,12 @@ body.dark-mode .book-title {
 
 .reviews-list-topbar {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    justify-content: flex-end;
+    margin-bottom: 8px;
 }
 
-.reviews-list-topbar h1 {
-    margin: 0;
+.reviews-list-container h1 {
+    margin: 0 0 20px;
     font-size: 20px;
 }
 

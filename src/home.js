@@ -92,7 +92,6 @@ document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     initLanguageToggle();
-    initLanguageToggle();
     initTheme('theme-toggle');
     const [booksLoaded] = await Promise.all([loadBooks(), loadReviews()]);
 
