@@ -412,9 +412,27 @@ body {
 
 .review-content ul li,
 .review-content ol li {
-    font-size: 15px;
+    font-size: inherit;
     margin: 4px 0;
     line-height: 1.4;
+}
+
+.review-content ul ul,
+.review-content ul ol,
+.review-content ol ul,
+.review-content ol ol {
+    font-size: 14px;
+}
+
+.review-content ul ul ul,
+.review-content ul ul ol,
+.review-content ul ol ul,
+.review-content ul ol ol,
+.review-content ol ul ul,
+.review-content ol ul ol,
+.review-content ol ol ul,
+.review-content ol ol ol {
+    font-size: 13px;
 }
 
 .review-content pre {
@@ -907,7 +925,25 @@ body.dark-mode .review-content a:hover {
 
     .review-content ul li,
     .review-content ol li {
-        font-size: 11px;
+        font-size: inherit;
+    }
+
+    .review-content ul ul,
+    .review-content ul ol,
+    .review-content ol ul,
+    .review-content ol ol {
+        font-size: 10px;
+    }
+
+    .review-content ul ul ul,
+    .review-content ul ul ol,
+    .review-content ul ol ul,
+    .review-content ul ol ol,
+    .review-content ol ul ul,
+    .review-content ol ul ol,
+    .review-content ol ol ul,
+    .review-content ol ol ol {
+        font-size: 9px;
     }
 
     .review-content img {
