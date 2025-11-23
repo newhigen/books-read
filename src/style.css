@@ -284,6 +284,7 @@ body {
     border-radius: 12px;
     padding: 24px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .review-topbar {
@@ -916,6 +917,7 @@ body.dark-mode .book-title {
     border-radius: 12px;
     padding: 20px;
     box-sizing: border-box;
+    position: relative;
 }
 
 .reviews-list-topbar {
@@ -1040,4 +1042,42 @@ body.dark-mode .review-title:hover {
 
 body.dark-mode .review-meta {
     color: #8b949e;
+}
+
+@media (max-width: 640px) {
+    .review-container {
+        padding-top: 60px;
+    }
+
+    .reviews-list-container {
+        padding-top: 56px;
+    }
+
+    .review-topbar,
+    .reviews-list-topbar {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        margin-bottom: 0;
+        gap: 10px;
+    }
+}
+
+@media (min-width: 641px) {
+    .review-container {
+        padding-top: 60px;
+    }
+
+    .reviews-list-container {
+        padding-top: 56px;
+    }
+
+    .review-topbar,
+    .reviews-list-topbar {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        margin-bottom: 0;
+        gap: 10px;
+    }
 }
