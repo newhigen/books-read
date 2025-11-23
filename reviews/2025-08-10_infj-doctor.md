@@ -141,4 +141,4 @@ INFJ는 의미 있는 해결책과 완결성을 추구한다.<br> 그래서 <emp
 [^6]: [[도서] 왜 나는 항상 결심만 할까, 켈리 맥고니걸, 2012](https://product.kyobobook.co.kr/detail/S000000733034)
 [^7]: [[도서] 달리기를 말할 때 내가 하고 싶은 이야기, 무라카미 하루키, 2008]({% post_url 2025-08-12-running-story %})
 [^8]: [[블로그] 'Layers of cheese' _ The Swiss Cheese Model for Quality Engineering, Imran Qureshi, Medium, 2023](https://medium.com/slalom-build/the-swiss-cheese-model-for-quality-engineering-ba05d26feb7e)
-[^9]: [[출처 미상] 평온을 비는 기도, 라인홀드 니버]
+[^9]: 평온을 비는 기도, 라인홀드 니버

@@ -77,7 +77,7 @@ publication_year: 2018
 
 ### A, B, C 작업 #2-1
 
-<img src="./assets/grow-together/abc작업.png" alt="abc작업" width="200">
+<img src="./assets/grow-together/abc작업.png" alt="abc작업" width="300">
 
 
 - 맨 아래 make it work, right, fast는 책 내용은 아니고 코딩 피라미드가 연상되서 기입
@@ -90,7 +90,7 @@ publication_year: 2018
 - 더하기 사고 vs 곱하기 사고
 - 부분의 합 < 전체
 
-![조직](./assets/grow-together/조직.png)
+<img src="./assets/grow-together/조직.png" alt="조직" width="500"/>
 
 - 직전 결과물로 다음 결과물 개선
     - 부트스트레핑
@@ -114,7 +114,7 @@ Q. 어떻게
 
 ## 학습 프레임과 실행 프레임 #3
 
-![image](./assets/grow-together/학습-실행-프레임.png)
+<img src="./assets/grow-together/학습-실행-프레임.png" alt="학습-실행-프레임" width="300"/>
 
 ## 직업 학습 난이도 ↑ ⇒ 생존 ↑ #4
 
@@ -146,13 +146,13 @@ Q. 어떻게
 
 - 적절한 i+1
 
-![image](./assets/grow-together/난이도-실력-그래프.png)
+<img src="./assets/grow-together/난이도-실력-그래프.png" alt="난이도-실력-그래프" width="300"/>
 
 - ☑ 내 상태를 의식하기
 
 몰입 밖(불안함 OR 지루함)에서 안으로 들어가는 방법 4가지 = 제자리 걸음 탈출
 
-![image](./assets/grow-together/제자리걸음-탈출방법.png)
+<img src="./assets/grow-together/제자리걸음-탈출방법.png" alt="제자리걸음-탈출방법" width="300"/>
 
 ### 지루함(너무 쉬울 때)에서 시작 #8-1
 
@@ -242,7 +242,7 @@ Q. 관리?
 
 ## S/W 관리 개선 순위 #13
 
-![image](./assets/grow-together/소프트웨어-관리-개선순위.png)
+<img src="./assets/grow-together/소프트웨어-관리-개선순위.png" alt="소프트웨어-관리-개선순위" width="250"/>
 
 but (가장 쉬운 것부터) 반대 순서로 개선하려함. 조엘 테스트.
 
@@ -310,17 +310,17 @@ S/W dev 관리 3가지 증력
 
 해당 영역 지식 없어도 OK!
 
-![image](./assets/grow-together/인지적작업분석-코칭.png)
+<img src="./assets/grow-together/인지적작업분석-코칭.png" alt="인지적작업분석-코칭" width="300"/>
 
 ## 하향식 접근의 함정 #18
 
-![image](./assets/grow-together/하향식접근-함정.png)
+<img src="./assets/grow-together/하향식접근-함정.png" alt="하향식접근-함정" width="400"/>
 
-![image](./assets/grow-together/전문가-자기수정.png)
+<img src="./assets/grow-together/전문가-자기수정.png" alt="전문가-자기수정" width="400"/>
 
 전문가일 수록 자기 수정 횟수 UP
 
-![image](./assets/grow-together/전문가팀-실패이유.png)
+<img src="./assets/grow-together/전문가팀-실패이유.png" alt="전문가팀-실패이유" width="400"/>
 
 삼투압적 의사소통 - '협력' _ 이동 (1원칙 7가지 중)[^2]
 
@@ -328,7 +328,7 @@ S/W dev 관리 3가지 증력
 
 ## 전문가 팀이 실패하는 이유 #19
 
-![image](./assets/grow-together/탁월한팀-구글연구.png)
+<img src="./assets/grow-together/탁월한팀-구글연구.png" alt="탁월한팀-구글연구" width="400"/>
 
 전문가
 
