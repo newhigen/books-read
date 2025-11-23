@@ -27,7 +27,16 @@ const TEXT = {
         legendLabels: ['1', '2', '3', '4+'],
         toggleLabel: 'English',
         toggleAriaLabel: '영어로 전환',
-        tooltipBullet: '•'
+        tooltipBullet: '•',
+        relativeToday: '오늘',
+        relativeDay: n => `${n}일 전`,
+        relativeDays: n => `${n}일 전`,
+        relativeWeek: n => `${n}주 전`,
+        relativeWeeks: n => `${n}주 전`,
+        relativeMonth: n => `${n}달 전`,
+        relativeMonths: n => `${n}달 전`,
+        relativeYear: n => `${n}년 전`,
+        relativeYears: n => `${n}년 전`
     },
     en: {
         heatmapTitle: 'Reading Heatmap',
@@ -45,7 +54,16 @@ const TEXT = {
         legendLabels: ['1', '2', '3', '4+'],
         toggleLabel: '한국어',
         toggleAriaLabel: 'Switch to Korean',
-        tooltipBullet: '•'
+        tooltipBullet: '•',
+        relativeToday: 'Today',
+        relativeDay: n => `${n} day ago`,
+        relativeDays: n => `${n} days ago`,
+        relativeWeek: n => `${n} week ago`,
+        relativeWeeks: n => `${n} weeks ago`,
+        relativeMonth: n => `${n} month ago`,
+        relativeMonths: n => `${n} months ago`,
+        relativeYear: n => `${n} year ago`,
+        relativeYears: n => `${n} years ago`
     }
 };
 
@@ -500,6 +518,52 @@ function safeStorageSet(key, value) {
     }
 }
 
+function formatRelativeDate(value) {
+    if (!value) return '';
+    const parsed = parseDate(value);
+    if (!parsed) return value;
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+    const diffMs = startOfToday - target;
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffDays <= 0) return t('relativeToday');
+    if (diffDays < 7) {
+        return diffDays === 1 ? t('relativeDay', 1) : t('relativeDays', diffDays);
+    }
+
+    const weeks = Math.floor(diffDays / 7);
+    if (weeks < 4) {
+        return weeks === 1 ? t('relativeWeek', 1) : t('relativeWeeks', weeks);
+    }
+
+    const months = Math.floor(diffDays / 30);
+    if (months < 12) {
+        return months === 1 ? t('relativeMonth', 1) : t('relativeMonths', months);
+    }
+
+    const years = Math.floor(diffDays / 365);
+    return years === 1 ? t('relativeYear', 1) : t('relativeYears', years);
+}
+
+function parseDate(value) {
+    const cleaned = String(value).trim();
+    const isoCandidate = cleaned.replace(/\./g, '-').replace(/\//g, '-');
+    const direct = new Date(isoCandidate);
+    if (!Number.isNaN(direct.getTime())) return direct;
+
+    if (/^\d{8}$/.test(cleaned)) {
+        const y = cleaned.slice(0, 4);
+        const m = cleaned.slice(4, 6);
+        const d = cleaned.slice(6, 8);
+        const alt = new Date(`${y}-${m}-${d}`);
+        if (!Number.isNaN(alt.getTime())) return alt;
+    }
+    return null;
+}
+
 /* Review Logic */
 
 async function loadReviews() {
@@ -624,11 +688,8 @@ function renderReviews() {
             link.href = review.url || `reviews/${review.permalink}.md`;
             item.appendChild(link);
 
-            const meta = createEl('div', 'review-meta');
-            const dateSpan = createEl('span', null, review.date);
-            meta.appendChild(dateSpan);
-
-            item.appendChild(meta);
+            const dateSpan = createEl('span', 'review-date', formatRelativeDate(review.date));
+            item.appendChild(dateSpan);
             list.appendChild(item);
         });
         container.appendChild(list);
