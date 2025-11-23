@@ -609,13 +609,15 @@ function renderReviews() {
         const heading = createEl('h2', null, t('reviewsTitle'));
         container.appendChild(heading);
 
-        if (!state.reviews || !state.reviews.length) {
+        const reviewsToShow = (state.reviews || []).slice(0, 3);
+
+        if (!reviewsToShow.length) {
             container.appendChild(createEl('p', 'heatmap-empty', t('noReviews')));
             return;
         }
 
         const list = createEl('ul', 'review-list');
-        state.reviews.forEach(review => {
+        reviewsToShow.forEach(review => {
             const item = createEl('li', 'review-item');
 
             const link = createEl('a', 'review-title', review.title);
@@ -625,11 +627,6 @@ function renderReviews() {
             const meta = createEl('div', 'review-meta');
             const dateSpan = createEl('span', null, review.date);
             meta.appendChild(dateSpan);
-
-            if (review.author) {
-                const authorSpan = createEl('span', null, `· ${review.author}`);
-                meta.appendChild(authorSpan);
-            }
 
             item.appendChild(meta);
             list.appendChild(item);
