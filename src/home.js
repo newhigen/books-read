@@ -524,8 +524,14 @@ function renderReviews() {
         }
 
         const list = createEl('ul', 'review-list recent-review-list');
+        let lastDateText = '';
         reviewsToShow.forEach(review => {
             const item = createEl('li', 'review-item recent-review-item');
+
+            const dateText = formatRelativeDate(review.date, state.language);
+            const dateSpan = createEl('span', 'review-date', dateText === lastDateText ? '' : dateText);
+            item.appendChild(dateSpan);
+            lastDateText = dateText;
 
             const link = createEl('a', 'review-title', getLocalizedReviewTitle(review));
             link.href = review.url || `review-detail.html?file=${encodeURIComponent(review.filename)}`;
@@ -536,9 +542,6 @@ function renderReviews() {
                 const badge = createEl('span', 'review-short-badge', 'Short');
                 item.appendChild(badge);
             }
-
-            const dateSpan = createEl('span', 'review-date', formatRelativeDate(review.date, state.language));
-            item.appendChild(dateSpan);
             list.appendChild(item);
         });
         container.appendChild(list);
