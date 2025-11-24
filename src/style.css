@@ -466,6 +466,34 @@ body {
     text-decoration-color: rgba(12, 62, 137, 0.5);
 }
 
+.review-content mark.key-highlight,
+.review-content .key-highlight {
+    background: #fff7c2;
+    color: #1f2328;
+    padding: 0 3px;
+    border-radius: 4px;
+}
+
+.inline-highlight,
+.review-content hi,
+.markdown-body hi {
+    background: #fff7c2;
+    color: #1f2930;
+    padding: 0 4px;
+    border-radius: 4px;
+    font-style: inherit;
+    display: inline-block;
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+
+body.dark-mode .inline-highlight,
+body.dark-mode .review-content hi,
+body.dark-mode .markdown-body hi {
+    background: #3c3a21;
+    color: #fef7e8;
+}
+
 .review-footer {
     margin-top: 20px;
     text-align: right;
