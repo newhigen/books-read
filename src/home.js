@@ -36,7 +36,8 @@ const TEXT = {
         tooltipBullet: '•',
         reviewsTitle: '최근 후기',
         noReviews: '아직 작성된 서평이 없어요.',
-        reviewsListAria: '후기 목록 페이지로 이동'
+        reviewsListAria: '후기 목록 페이지로 이동',
+        summaryLabel: '결산'
     },
     en: {
         heatmapTitle: 'Reading Heatmap',
@@ -57,7 +58,8 @@ const TEXT = {
         tooltipBullet: '•',
         reviewsTitle: 'Recent Posts',
         noReviews: 'No posts yet.',
-        reviewsListAria: 'Go to posts list page'
+        reviewsListAria: 'Go to posts list page',
+        summaryLabel: 'Summary'
     }
 };
 
@@ -68,7 +70,8 @@ const state = {
     language: 'ko',
     yearRefs: [],
     reviews: [],
-    reviewLookup: new Map()
+    reviewLookup: new Map(),
+    summariesByYear: new Map()
 };
 
 const normalizeText = value => (value ?? '').trim();
@@ -289,7 +292,7 @@ function updateBookColumnsLanguage() {
     updateWithPreservedHeight(dom.pastList, () => {
         state.yearRefs.forEach(refs => {
             const books = state.booksByYear.get(refs.year) || [];
-            refs.heading.textContent = t('yearHeading', refs.year);
+            applyYearHeadingContent(refs.heading, refs.year);
             refs.summary.textContent = t('yearSummary', books.length);
             let lastMonth = null;
             books.forEach((book, index) => {
@@ -309,10 +312,30 @@ function updateBookColumnsLanguage() {
     });
 }
 
+function applyYearHeadingContent(headingEl, year) {
+    headingEl.textContent = t('yearHeading', year);
+    const summaryLink = createYearSummaryLink(year);
+    if (summaryLink) {
+        headingEl.appendChild(document.createTextNode(' '));
+        headingEl.appendChild(summaryLink);
+    }
+}
+
+function createYearSummaryLink(year) {
+    const summaryReview = state.summariesByYear.get(year);
+    if (!summaryReview) return null;
+    const link = createEl('a', 'year-summary-link', t('summaryLabel'));
+    link.href =
+        summaryReview.url || `review-detail.html?file=${encodeURIComponent(summaryReview.filename)}`;
+    link.setAttribute('aria-label', `${year} ${t('summaryLabel')}`);
+    return link;
+}
+
 function createYearSection(year) {
     const fragment = document.createDocumentFragment();
     const books = state.booksByYear.get(year) || [];
-    const heading = createEl('h2', null, t('yearHeading', year));
+    const heading = createEl('h2');
+    applyYearHeadingContent(heading, year);
     fragment.appendChild(heading);
     const summary = createEl('p', 'year-summary', t('yearSummary', books.length));
     fragment.appendChild(summary);
@@ -477,6 +500,7 @@ async function loadReviews() {
         }))
         .sort((a, b) => new Date(b.date) - new Date(a.date));
     buildReviewLookup(state.reviews);
+    buildSummaryLookup(state.reviews);
     return state.reviews.length > 0;
 }
 
@@ -499,6 +523,15 @@ function buildReviewLookup(reviews) {
     reviews.forEach(review => {
         const normalizedTitle = normalizeText(review.title).toLowerCase();
         if (normalizedTitle) state.reviewLookup.set(normalizedTitle, review);
+    });
+}
+
+function buildSummaryLookup(reviews) {
+    state.summariesByYear = new Map();
+    reviews.forEach(review => {
+        const year = getSummaryYear(review);
+        if (!year) return;
+        if (!state.summariesByYear.has(year)) state.summariesByYear.set(year, review);
     });
 }
 
@@ -554,6 +587,16 @@ async function fetchReviewsIndex() {
 
 function getReviewsData() {
     return Array.isArray(window.REVIEWS) ? window.REVIEWS : [];
+}
+
+function getSummaryYear(review) {
+    const value = review.summary_year ?? review.summaryYear;
+    const year = parseInt(value, 10);
+    return Number.isFinite(year) ? year : null;
+}
+
+function isSummaryReview(review) {
+    return Boolean(getSummaryYear(review));
 }
 
 function isBookReview(review) {
