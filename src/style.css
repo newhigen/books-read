@@ -282,7 +282,7 @@ body {
     background: #ffffff;
     border: 1px solid #e1e4e8;
     border-radius: 12px;
-    padding: 72px 24px 24px;
+    padding: 96px 24px 24px;
     box-sizing: border-box;
     position: relative;
 }
@@ -342,7 +342,7 @@ body {
 }
 
 .review-header .review-meta {
-    margin: 0 0 10px;
+    margin: 0 0 18px;
     color: #6a737d;
     font-size: 16px;
     text-align: center;
@@ -994,16 +994,27 @@ body.dark-mode .inline-thought {
     }
 
     .review-container {
-        padding: 56px 14px 14px;
+        padding: 76px 14px 14px;
     }
 
     .review-header h1 {
-        font-size: 19px;
+        font-size: 22px;
     }
 
-    .review-meta,
-    .review-date {
+    .review-meta {
         font-size: 12px;
+    }
+
+    .review-header .review-meta {
+        margin-bottom: 18px;
+    }
+
+    .review-footer {
+        margin-top: 26px;
+    }
+
+    .review-footer .review-date {
+        font-size: 9px;
     }
 
     .review-content h1 {
