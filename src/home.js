@@ -15,6 +15,11 @@ const MONTHS_PER_YEAR = 12;
 const MONTH_LABELS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const LANGUAGE_EMOJI = { ko: '🇰🇷', en: '🇺🇸' };
 const DATA_FILES = ['books.csv', 'books.csv.example'];
+const REVIEW_TITLE_ALIASES = {
+    '이동진 독서법': '독서법',
+    '책 잘 읽는 방법': '독서법',
+    '진작 이렇게 책을 읽었더라면': '독서법'
+};
 
 const TEXT = {
     ko: {
@@ -520,9 +525,21 @@ function findReviewForBook(book) {
 
 function buildReviewLookup(reviews) {
     state.reviewLookup = new Map();
+    const titleToReview = new Map();
     reviews.forEach(review => {
         const normalizedTitle = normalizeText(review.title).toLowerCase();
-        if (normalizedTitle) state.reviewLookup.set(normalizedTitle, review);
+        if (normalizedTitle) {
+            state.reviewLookup.set(normalizedTitle, review);
+            titleToReview.set(normalizedTitle, review);
+        }
+    });
+    Object.entries(REVIEW_TITLE_ALIASES).forEach(([aliasTitle, targetTitle]) => {
+        const normalizedAlias = normalizeText(aliasTitle).toLowerCase();
+        const normalizedTarget = normalizeText(targetTitle).toLowerCase();
+        if (!normalizedAlias || !normalizedTarget) return;
+        if (titleToReview.has(normalizedAlias)) return;
+        const targetReview = titleToReview.get(normalizedTarget);
+        if (targetReview) state.reviewLookup.set(normalizedAlias, targetReview);
     });
 }
 
