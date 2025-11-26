@@ -22,6 +22,17 @@ async function loadReviews() {
         .sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
+const normalizeText = value => (value ?? '').trim();
+const isBookReview = review => Boolean(review.publication_year ?? review.publicationYear);
+
+function formatReviewTitle(review) {
+    const title = normalizeText(review.title);
+    if (!title) return review.title;
+    if (!isBookReview(review)) return title;
+    const alreadyWrapped = title.startsWith('『') && title.endsWith('』');
+    return alreadyWrapped ? title : `『${title}』`;
+}
+
 function renderList(container, reviews) {
     container.innerHTML = '';
     const list = document.createElement('ul');
@@ -40,7 +51,7 @@ function renderList(container, reviews) {
         const link = document.createElement('a');
         link.className = 'review-title';
         link.href = review.url || `review-detail.html?file=${encodeURIComponent(review.filename)}`;
-        link.textContent = review.title;
+        link.textContent = formatReviewTitle(review);
 
         const date = document.createElement('span');
         date.className = 'review-date reviews-archive-date';

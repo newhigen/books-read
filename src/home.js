@@ -556,10 +556,29 @@ function getReviewsData() {
     return Array.isArray(window.REVIEWS) ? window.REVIEWS : [];
 }
 
+function isBookReview(review) {
+    const publicationYear = review.publication_year ?? review.publicationYear;
+    return Boolean(publicationYear);
+}
+
 function getLocalizedReviewTitle(review) {
-    if (state.language !== 'en') return review.title;
-    const normalizedReviewTitle = normalizeText(review.title).toLowerCase();
-    const match = (state.books || []).find(book => getCanonicalTitle(book).toLowerCase() === normalizedReviewTitle);
-    if (match && normalizeText(match.englishTitle)) return match.englishTitle;
-    return review.title;
+    const localizedTitle =
+        state.language !== 'en'
+            ? review.title
+            : (() => {
+                  const normalizedReviewTitle = normalizeText(review.title).toLowerCase();
+                  const match = (state.books || []).find(
+                      book => getCanonicalTitle(book).toLowerCase() === normalizedReviewTitle
+                  );
+                  if (match && normalizeText(match.englishTitle)) return match.englishTitle;
+                  return review.title;
+              })();
+
+    if (!isBookReview(review)) return localizedTitle;
+
+    const trimmedTitle = normalizeText(localizedTitle);
+    if (!trimmedTitle) return localizedTitle;
+
+    const alreadyWrapped = trimmedTitle.startsWith('『') && trimmedTitle.endsWith('』');
+    return alreadyWrapped ? trimmedTitle : `『${trimmedTitle}』`;
 }
