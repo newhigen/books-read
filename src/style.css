@@ -389,13 +389,13 @@ body {
 }
 
 .review-content blockquote {
-    margin: 10px 0;
-    padding: 8px 16px;
-    border-left: 3px solid #cdd9ed;
-    background: #f4f7fb;
-    color: #273248;
-    border-radius: 0;
+    margin: 8px 0;
+    padding: 6px 12px;
+    border: 1px solid #d9e2ef;
+    background: linear-gradient(120deg, #f7f9fc 0%, #f2f5f9 100%);
+    color: #1f2933;
     font-style: normal;
+    box-shadow: 0 4px 10px rgba(15, 77, 168, 0.06);
 }
 
 .review-content ul,
@@ -747,9 +747,22 @@ body.dark-mode .review-content h6 {
 }
 
 body.dark-mode .review-content blockquote {
-    background: #0e1726;
-    border-color: #293655;
-    color: #cdd6e5;
+    background: linear-gradient(120deg, #0f1826 0%, #0b1220 100%);
+    border-color: #34445c;
+    color: #d5deeb;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.review-content blockquote>* {
+    margin: 4px 0;
+}
+
+.review-content blockquote>*:first-child {
+    margin-top: 0;
+}
+
+.review-content blockquote>*:last-child {
+    margin-bottom: 0;
 }
 
 body.dark-mode .review-content code {
