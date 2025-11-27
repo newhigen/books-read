@@ -1,5 +1,7 @@
 :root {
     color-scheme: light dark;
+    /* PC 홈 레이아웃(360px x 2 + 6px gap)과 동일한 폭을 맞추기 위한 기준 */
+    --content-max-width: 726px;
 }
 
 body {
@@ -308,7 +310,7 @@ body {
 }
 
 .review-container {
-    max-width: 640px;
+    max-width: var(--content-max-width);
     margin: 0 auto;
     background: #ffffff;
     border: 1px solid #e1e4e8;
@@ -1253,7 +1255,7 @@ body.dark-mode .inline-thought {
 }
 
 .reviews-list-container {
-    max-width: 720px;
+    max-width: var(--content-max-width);
     margin: 0 auto;
     background: #ffffff;
     border: 1px solid #e1e4e8;
