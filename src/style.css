@@ -569,19 +569,20 @@ body.dark-mode .markdown-body hi {
 .year-summary-link {
     font-size: 11px;
     font-weight: 600;
-    color: #444d56;
+    color: #0f4da8;
     margin-left: 8px;
-    padding: 2px 6px;
-    border: 1px solid #d0d7de;
-    border-radius: 4px;
-    background: #f8fafc;
+    padding: 3px 8px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: rgba(15, 77, 168, 0.08);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     text-decoration: none;
     line-height: 1.4;
 }
 
 .year-summary-link:hover {
-    background: #eef2f6;
+    color: #0b3580;
+    background: rgba(11, 53, 128, 0.12);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
@@ -742,14 +743,15 @@ body.dark-mode .books-column li span.month {
 }
 
 body.dark-mode .year-summary-link {
-    border-color: #4b5563;
-    background: #0f172a;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    color: #9cc4ff;
+    background: rgba(156, 196, 255, 0.1);
+    border-color: transparent;
 }
 
 body.dark-mode .year-summary-link:hover {
-    background: #1e293b;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    color: #b8d7ff;
+    background: rgba(156, 196, 255, 0.16);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .heatmap-cell {
