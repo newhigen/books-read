@@ -14,7 +14,7 @@ const dom = {
 };
 
 const MONTHS_PER_YEAR = 12;
-const DATA_FILES = ['books.csv', 'books.csv.example'];
+const DATA_FILES = ['books.csv'];
 const REVIEW_TITLE_ALIASES = {
     '이동진 독서법': '독서법',
     '책 잘 읽는 방법': '독서법',
@@ -22,6 +22,7 @@ const REVIEW_TITLE_ALIASES = {
 };
 const FLAG_EMOJI = { ko: '🇰🇷', en: '🇺🇸' };
 const BLOG_URL = 'https://newhigen.github.io/';
+const GITHUB_URL = 'https://github.com/newhigen/books';
 
 const COPY = {
     heatmapTitle: '독서 히트맵',
@@ -81,7 +82,7 @@ async function init() {
         renderAll();
     } else {
         renderReviews();
-        renderBlogLinks();
+        renderExternalLinks();
     }
 }
 
@@ -110,20 +111,16 @@ function updateLanguageToggleUI() {
 }
 
 async function loadBooks() {
-    for (const file of DATA_FILES) {
-        try {
-            const response = await fetch(file);
-            if (!response.ok) continue;
-            const csv = await response.text();
-            state.books = parseCSV(csv).sort(sortBooksDesc);
-            return true;
-        } catch {
-            // try next file
-        }
+    try {
+        const response = await fetch(DATA_FILES[0]);
+        if (!response.ok) throw new Error('failed to load books.csv');
+        const csv = await response.text();
+        state.books = parseCSV(csv).sort(sortBooksDesc);
+        return true;
+    } catch {
+        dom.heatmap.textContent = '데이터 파일을 찾지 못했어요. books.csv를 확인해주세요.';
+        return false;
     }
-    dom.heatmap.textContent =
-        '데이터 파일을 찾지 못했어요. books.csv 또는 books.csv.example을 확인해주세요.';
-    return false;
 }
 
 function parseCSV(text) {
@@ -187,7 +184,7 @@ function renderAll() {
     renderHeatmap();
     renderBookColumns();
     renderReviews();
-    renderBlogLinks();
+    renderExternalLinks();
 }
 
 function renderHeatmap() {
@@ -665,21 +662,29 @@ function getLocalizedReviewTitle(review) {
     return alreadyWrapped ? trimmedTitle : `『${trimmedTitle}』`;
 }
 
-function renderBlogLinks() {
-    renderSingleBlogLink(dom.blogDesktop, 'desktop');
-    renderSingleBlogLink(dom.blogMobile, 'mobile');
+function renderExternalLinks() {
+    renderSingleExternalLinks(dom.blogDesktop);
+    renderSingleExternalLinks(dom.blogMobile);
 }
 
-function renderSingleBlogLink(container, variant) {
+function renderSingleExternalLinks(container) {
     if (!container) return;
     updateWithPreservedHeight(container, () => {
         container.innerHTML = '';
-        const wrapper = createEl('div', `blog-link-container ${variant === 'mobile' ? 'blog-link-mobile' : 'blog-link-desktop'}`);
-        const blogLink = createEl('a', 'blog-link-button', '블로그');
-        blogLink.href = BLOG_URL;
-        blogLink.target = '_blank';
-        blogLink.rel = 'noopener noreferrer';
+        const wrapper = createEl('div', 'blog-link-container');
+        const blogLink = createExternalLink('블로그', BLOG_URL);
+        const githubLink = createExternalLink('GitHub', GITHUB_URL);
         wrapper.appendChild(blogLink);
+        wrapper.appendChild(githubLink);
         container.appendChild(wrapper);
     });
+}
+
+function createExternalLink(label, url) {
+    const link = createEl('a', 'blog-link-button');
+    link.innerHTML = `${label}<sup>↗</sup>`;
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    return link;
 }
