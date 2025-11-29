@@ -17,7 +17,7 @@
 ## 시작하기
 
 1. 템플릿을 fork/Use this template로 복사합니다.
-2. `books.csv.example`를 `books.csv`로 복사해 내용을 채웁니다. 컬럼 순서: `title, english-title, year, month`.
+2. `books.csv`에 독서 기록을 채웁니다. 컬럼 순서: `title, english-title, year, month`.
 3. `favicon.ico`를 교체하면 탭 아이콘이 바뀝니다.
 
 ## GitHub Pages 배포

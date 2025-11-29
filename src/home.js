@@ -14,7 +14,7 @@ const dom = {
 };
 
 const MONTHS_PER_YEAR = 12;
-const DATA_FILES = ['books.csv', 'books.csv.example'];
+const DATA_FILES = ['books.csv'];
 const REVIEW_TITLE_ALIASES = {
     '이동진 독서법': '독서법',
     '책 잘 읽는 방법': '독서법',
@@ -111,20 +111,16 @@ function updateLanguageToggleUI() {
 }
 
 async function loadBooks() {
-    for (const file of DATA_FILES) {
-        try {
-            const response = await fetch(file);
-            if (!response.ok) continue;
-            const csv = await response.text();
-            state.books = parseCSV(csv).sort(sortBooksDesc);
-            return true;
-        } catch {
-            // try next file
-        }
+    try {
+        const response = await fetch(DATA_FILES[0]);
+        if (!response.ok) throw new Error('failed to load books.csv');
+        const csv = await response.text();
+        state.books = parseCSV(csv).sort(sortBooksDesc);
+        return true;
+    } catch {
+        dom.heatmap.textContent = '데이터 파일을 찾지 못했어요. books.csv를 확인해주세요.';
+        return false;
     }
-    dom.heatmap.textContent =
-        '데이터 파일을 찾지 못했어요. books.csv 또는 books.csv.example을 확인해주세요.';
-    return false;
 }
 
 function parseCSV(text) {
