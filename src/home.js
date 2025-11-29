@@ -48,6 +48,7 @@ const state = {
     heatmapBuckets: new Map(),
     titleLanguage: 'ko',
     yearRefs: [],
+    collapsedYears: new Map(),
     reviews: [],
     reviewLookup: new Map(),
     summariesByYear: new Map()
@@ -258,10 +259,15 @@ function renderBookColumns() {
     }
 
     const years = Array.from(state.booksByYear.keys()).sort((a, b) => b - a);
+    const currentYear = new Date().getFullYear();
     updateWithPreservedHeight(dom.pastList, () => {
         dom.pastList.innerHTML = '';
         years.forEach(year => {
-            const { fragment, refs } = createYearSection(year);
+            if (!state.collapsedYears.has(year)) {
+                state.collapsedYears.set(year, year !== currentYear);
+            }
+            const isCollapsed = state.collapsedYears.get(year);
+            const { fragment, refs } = createYearSection(year, isCollapsed);
             dom.pastList.appendChild(fragment);
             state.yearRefs.push(refs);
         });
@@ -278,7 +284,10 @@ function updateBookColumnsLanguage() {
         state.yearRefs.forEach(refs => {
             const books = state.booksByYear.get(refs.year) || [];
             applyYearHeadingContent(refs.heading, refs.year);
-            refs.summary.textContent = t('yearSummary', books.length);
+            if (refs.summaryText) {
+                refs.summaryText.textContent = t('yearSummary', books.length);
+            }
+            applyYearCollapsedState(refs.year, refs, state.collapsedYears.get(refs.year));
             let lastMonth = null;
             books.forEach((book, index) => {
                 const span = refs.monthSpans[index];
@@ -316,16 +325,25 @@ function createYearSummaryLink(year) {
     return link;
 }
 
-function createYearSection(year) {
+function createYearSection(year, isCollapsed = false) {
     const fragment = document.createDocumentFragment();
     const books = state.booksByYear.get(year) || [];
     const heading = createEl('h2');
     applyYearHeadingContent(heading, year);
     fragment.appendChild(heading);
-    const summary = createEl('p', 'year-summary', t('yearSummary', books.length));
-    fragment.appendChild(summary);
+
+    const listId = `year-${year}-books`;
+    const summaryButton = createEl('button', 'year-summary');
+    summaryButton.type = 'button';
+    summaryButton.setAttribute('aria-controls', listId);
+    const summaryText = createEl('span', 'year-summary-text', t('yearSummary', books.length));
+    const toggleIcon = createEl('span', 'year-toggle-icon');
+    summaryButton.appendChild(summaryText);
+    summaryButton.appendChild(toggleIcon);
+    fragment.appendChild(summaryButton);
 
     const list = createEl('ul');
+    list.id = listId;
     const monthSpans = [];
     const badgeSpans = [];
     let lastMonth = null;
@@ -369,16 +387,44 @@ function createYearSection(year) {
     });
 
     fragment.appendChild(list);
-    return {
-        fragment,
-        refs: {
-            year,
-            heading,
-            summary,
-            monthSpans,
-            badgeSpans
-        }
+    const refs = {
+        year,
+        heading,
+        summaryButton,
+        summaryText,
+        toggleIcon,
+        list,
+        monthSpans,
+        badgeSpans
     };
+
+    summaryButton.addEventListener('click', () => {
+        const nextCollapsed = !state.collapsedYears.get(year);
+        applyYearCollapsedState(year, refs, nextCollapsed);
+    });
+
+    applyYearCollapsedState(year, refs, isCollapsed);
+
+    return { fragment, refs };
+}
+
+function applyYearCollapsedState(year, refs, collapsed) {
+    const isCollapsed = Boolean(collapsed);
+    state.collapsedYears.set(year, isCollapsed);
+    if (refs.list) refs.list.hidden = isCollapsed;
+    if (refs.summaryButton) {
+        refs.summaryButton.setAttribute('aria-expanded', (!isCollapsed).toString());
+        refs.summaryButton.classList.toggle('is-collapsed', isCollapsed);
+    }
+    if (refs.toggleIcon) refs.toggleIcon.textContent = isCollapsed ? '▸' : '▾';
+    updateYearToggleLabel(refs, isCollapsed);
+}
+
+function updateYearToggleLabel(refs, collapsed) {
+    if (!refs?.summaryButton || !refs.summaryText) return;
+    const summaryText = refs.summaryText.textContent || '';
+    const action = collapsed ? '펼치기' : '접기';
+    refs.summaryButton.setAttribute('aria-label', `${refs.year}년 ${summaryText} 목록 ${action}`);
 }
 
 function showBookList(cell, books, year, monthLabel) {
