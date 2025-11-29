@@ -8,7 +8,9 @@ const dom = {
     heatmap: document.getElementById('reading-heatmap'),
     pastList: document.getElementById('past-books'),
     languageToggle: document.getElementById('language-toggle'),
-    themeToggle: document.getElementById('theme-toggle')
+    themeToggle: document.getElementById('theme-toggle'),
+    blogDesktop: document.getElementById('blog-link-desktop'),
+    blogMobile: document.getElementById('blog-link-mobile')
 };
 
 const MONTHS_PER_YEAR = 12;
@@ -19,6 +21,7 @@ const REVIEW_TITLE_ALIASES = {
     '진작 이렇게 책을 읽었더라면': '독서법'
 };
 const FLAG_EMOJI = { ko: '🇰🇷', en: '🇺🇸' };
+const BLOG_URL = 'https://newhigen.github.io/';
 
 const COPY = {
     heatmapTitle: '독서 히트맵',
@@ -78,6 +81,7 @@ async function init() {
         renderAll();
     } else {
         renderReviews();
+        renderBlogLinks();
     }
 }
 
@@ -183,6 +187,7 @@ function renderAll() {
     renderHeatmap();
     renderBookColumns();
     renderReviews();
+    renderBlogLinks();
 }
 
 function renderHeatmap() {
@@ -656,4 +661,23 @@ function getLocalizedReviewTitle(review) {
 
     const alreadyWrapped = trimmedTitle.startsWith('『') && trimmedTitle.endsWith('』');
     return alreadyWrapped ? trimmedTitle : `『${trimmedTitle}』`;
+}
+
+function renderBlogLinks() {
+    renderSingleBlogLink(dom.blogDesktop, 'desktop');
+    renderSingleBlogLink(dom.blogMobile, 'mobile');
+}
+
+function renderSingleBlogLink(container, variant) {
+    if (!container) return;
+    updateWithPreservedHeight(container, () => {
+        container.innerHTML = '';
+        const wrapper = createEl('div', `blog-link-container ${variant === 'mobile' ? 'blog-link-mobile' : 'blog-link-desktop'}`);
+        const blogLink = createEl('a', 'blog-link-button', '블로그');
+        blogLink.href = BLOG_URL;
+        blogLink.target = '_blank';
+        blogLink.rel = 'noopener noreferrer';
+        wrapper.appendChild(blogLink);
+        container.appendChild(wrapper);
+    });
 }
