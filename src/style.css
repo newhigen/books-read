@@ -615,7 +615,8 @@ body.dark-mode .markdown-body hi {
     height: 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 4px;
     width: 100%;
     background: none;
     border: none;
@@ -631,10 +632,15 @@ body.dark-mode .markdown-body hi {
 }
 
 .year-summary-text {
-    flex: 1;
+    flex: 0 0 auto;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.year-toggle-icon {
+    position: relative;
+    top: -1px;
 }
 
 .year-toggle-icon {
