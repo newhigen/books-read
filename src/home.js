@@ -1,6 +1,6 @@
 import {
-    formatRelativeDate,
     createEl,
+    formatRelativeDate,
     initTheme
 } from './utils.js';
 
@@ -8,7 +8,9 @@ const dom = {
     heatmap: document.getElementById('reading-heatmap'),
     pastList: document.getElementById('past-books'),
     languageToggle: document.getElementById('language-toggle'),
-    themeToggle: document.getElementById('theme-toggle')
+    themeToggle: document.getElementById('theme-toggle'),
+    blogDesktop: document.getElementById('blog-link-desktop'),
+    blogMobile: document.getElementById('blog-link-mobile')
 };
 
 const MONTHS_PER_YEAR = 12;
@@ -19,6 +21,7 @@ const REVIEW_TITLE_ALIASES = {
     '진작 이렇게 책을 읽었더라면': '독서법'
 };
 const FLAG_EMOJI = { ko: '🇰🇷', en: '🇺🇸' };
+const BLOG_URL = 'https://newhigen.github.io/';
 
 const COPY = {
     heatmapTitle: '독서 히트맵',
@@ -48,6 +51,7 @@ const state = {
     heatmapBuckets: new Map(),
     titleLanguage: 'ko',
     yearRefs: [],
+    collapsedYears: new Map(),
     reviews: [],
     reviewLookup: new Map(),
     summariesByYear: new Map()
@@ -77,6 +81,7 @@ async function init() {
         renderAll();
     } else {
         renderReviews();
+        renderBlogLinks();
     }
 }
 
@@ -182,6 +187,7 @@ function renderAll() {
     renderHeatmap();
     renderBookColumns();
     renderReviews();
+    renderBlogLinks();
 }
 
 function renderHeatmap() {
@@ -258,10 +264,15 @@ function renderBookColumns() {
     }
 
     const years = Array.from(state.booksByYear.keys()).sort((a, b) => b - a);
+    const currentYear = new Date().getFullYear();
     updateWithPreservedHeight(dom.pastList, () => {
         dom.pastList.innerHTML = '';
         years.forEach(year => {
-            const { fragment, refs } = createYearSection(year);
+            if (!state.collapsedYears.has(year)) {
+                state.collapsedYears.set(year, year !== currentYear);
+            }
+            const isCollapsed = state.collapsedYears.get(year);
+            const { fragment, refs } = createYearSection(year, isCollapsed);
             dom.pastList.appendChild(fragment);
             state.yearRefs.push(refs);
         });
@@ -278,7 +289,10 @@ function updateBookColumnsLanguage() {
         state.yearRefs.forEach(refs => {
             const books = state.booksByYear.get(refs.year) || [];
             applyYearHeadingContent(refs.heading, refs.year);
-            refs.summary.textContent = t('yearSummary', books.length);
+            if (refs.summaryText) {
+                refs.summaryText.textContent = t('yearSummary', books.length);
+            }
+            applyYearCollapsedState(refs.year, refs, state.collapsedYears.get(refs.year));
             let lastMonth = null;
             books.forEach((book, index) => {
                 const span = refs.monthSpans[index];
@@ -316,16 +330,25 @@ function createYearSummaryLink(year) {
     return link;
 }
 
-function createYearSection(year) {
+function createYearSection(year, isCollapsed = false) {
     const fragment = document.createDocumentFragment();
     const books = state.booksByYear.get(year) || [];
     const heading = createEl('h2');
     applyYearHeadingContent(heading, year);
     fragment.appendChild(heading);
-    const summary = createEl('p', 'year-summary', t('yearSummary', books.length));
-    fragment.appendChild(summary);
+
+    const listId = `year-${year}-books`;
+    const summaryButton = createEl('button', 'year-summary');
+    summaryButton.type = 'button';
+    summaryButton.setAttribute('aria-controls', listId);
+    const summaryText = createEl('span', 'year-summary-text', t('yearSummary', books.length));
+    const toggleIcon = createEl('span', 'year-toggle-icon');
+    summaryButton.appendChild(summaryText);
+    summaryButton.appendChild(toggleIcon);
+    fragment.appendChild(summaryButton);
 
     const list = createEl('ul');
+    list.id = listId;
     const monthSpans = [];
     const badgeSpans = [];
     let lastMonth = null;
@@ -369,16 +392,44 @@ function createYearSection(year) {
     });
 
     fragment.appendChild(list);
-    return {
-        fragment,
-        refs: {
-            year,
-            heading,
-            summary,
-            monthSpans,
-            badgeSpans
-        }
+    const refs = {
+        year,
+        heading,
+        summaryButton,
+        summaryText,
+        toggleIcon,
+        list,
+        monthSpans,
+        badgeSpans
     };
+
+    summaryButton.addEventListener('click', () => {
+        const nextCollapsed = !state.collapsedYears.get(year);
+        applyYearCollapsedState(year, refs, nextCollapsed);
+    });
+
+    applyYearCollapsedState(year, refs, isCollapsed);
+
+    return { fragment, refs };
+}
+
+function applyYearCollapsedState(year, refs, collapsed) {
+    const isCollapsed = Boolean(collapsed);
+    state.collapsedYears.set(year, isCollapsed);
+    if (refs.list) refs.list.hidden = isCollapsed;
+    if (refs.summaryButton) {
+        refs.summaryButton.setAttribute('aria-expanded', (!isCollapsed).toString());
+        refs.summaryButton.classList.toggle('is-collapsed', isCollapsed);
+    }
+    if (refs.toggleIcon) refs.toggleIcon.textContent = isCollapsed ? '▸' : '▾';
+    updateYearToggleLabel(refs, isCollapsed);
+}
+
+function updateYearToggleLabel(refs, collapsed) {
+    if (!refs?.summaryButton || !refs.summaryText) return;
+    const summaryText = refs.summaryText.textContent || '';
+    const action = collapsed ? '펼치기' : '접기';
+    refs.summaryButton.setAttribute('aria-label', `${refs.year}년 ${summaryText} 목록 ${action}`);
 }
 
 function showBookList(cell, books, year, monthLabel) {
@@ -546,7 +597,7 @@ function renderReviews() {
         header.appendChild(heading);
         container.appendChild(header);
 
-        const reviewsToShow = (state.reviews || []).slice(0, 3);
+        const reviewsToShow = (state.reviews || []).slice(0, 5);
 
         if (!reviewsToShow.length) {
             container.appendChild(createEl('p', 'heatmap-empty', t('noReviews')));
@@ -610,4 +661,23 @@ function getLocalizedReviewTitle(review) {
 
     const alreadyWrapped = trimmedTitle.startsWith('『') && trimmedTitle.endsWith('』');
     return alreadyWrapped ? trimmedTitle : `『${trimmedTitle}』`;
+}
+
+function renderBlogLinks() {
+    renderSingleBlogLink(dom.blogDesktop, 'desktop');
+    renderSingleBlogLink(dom.blogMobile, 'mobile');
+}
+
+function renderSingleBlogLink(container, variant) {
+    if (!container) return;
+    updateWithPreservedHeight(container, () => {
+        container.innerHTML = '';
+        const wrapper = createEl('div', `blog-link-container ${variant === 'mobile' ? 'blog-link-mobile' : 'blog-link-desktop'}`);
+        const blogLink = createEl('a', 'blog-link-button', '블로그');
+        blogLink.href = BLOG_URL;
+        blogLink.target = '_blank';
+        blogLink.rel = 'noopener noreferrer';
+        wrapper.appendChild(blogLink);
+        container.appendChild(wrapper);
+    });
 }
