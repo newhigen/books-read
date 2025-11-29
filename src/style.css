@@ -216,11 +216,14 @@ body {
 }
 
 .heatmap-cell {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 3px;
     background: #ffffff;
-    border: 1px solid #e0e0e0;
+    border: 0.5px solid #e0e0e0;
+    margin: 1px;
+    padding: 2px;
+    background-clip: content-box;
     transition: transform 0.15s ease;
     position: relative;
     box-sizing: border-box;
@@ -228,22 +231,18 @@ body {
 
 .heatmap-cell.level-1 {
     background: #cfe7ff;
-    border-color: transparent;
 }
 
 .heatmap-cell.level-2 {
     background: #80b9ff;
-    border-color: transparent;
 }
 
 .heatmap-cell.level-3 {
     background: #2f7fff;
-    border-color: transparent;
 }
 
 .heatmap-cell.level-4 {
     background: #0f4da8;
-    border-color: transparent;
 }
 
 .heatmap-cell:hover {
@@ -283,10 +282,15 @@ body {
 }
 
 .heatmap-legend-square {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     border-radius: 3px;
     background: #e3efff;
+    border: 0.5px solid #e0e0e0;
+    margin: 1px;
+    padding: 1px;
+    background-clip: content-box;
+    box-sizing: border-box;
 }
 
 .heatmap-legend-square.level-1 {
@@ -797,6 +801,10 @@ body.dark-mode .heatmap-cell {
 
 body.dark-mode .heatmap-cell:not([class*="level"]) {
     background: #1e2433;
+}
+
+body.dark-mode .heatmap-legend-square {
+    border-color: #4b5563;
 }
 
 body.dark-mode .reread-badge {

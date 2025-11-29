@@ -1,6 +1,6 @@
 import {
-    formatRelativeDate,
     createEl,
+    formatRelativeDate,
     initTheme
 } from './utils.js';
 
@@ -592,7 +592,7 @@ function renderReviews() {
         header.appendChild(heading);
         container.appendChild(header);
 
-        const reviewsToShow = (state.reviews || []).slice(0, 3);
+        const reviewsToShow = (state.reviews || []).slice(0, 5);
 
         if (!reviewsToShow.length) {
             container.appendChild(createEl('p', 'heatmap-empty', t('noReviews')));
