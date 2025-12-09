@@ -556,16 +556,16 @@ body.dark-mode {
 }
 
 .review-content blockquote {
-    margin: 10px 0;
-    padding: 10px 14px;
-    border: 1px solid rgba(var(--accent-rgb), 0.22);
-    background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.14), rgba(255, 255, 255, 0.94));
-    color: var(--text);
+    margin: 12px 0;
+    padding: 12px 14px;
+    border: 1px solid var(--card-border);
+    background: rgba(var(--accent-rgb), 0.04);
+    color: var(--muted);
     font-style: normal;
-    box-shadow: 0 12px 28px rgba(17, 23, 41, 0.08);
+    box-shadow: 0 6px 16px rgba(17, 23, 41, 0.06);
     font-size: 15px;
     line-height: 1.55;
-    border-radius: 12px;
+    border-radius: 8px;
 }
 
 .review-content blockquote p {
@@ -965,10 +965,10 @@ body.dark-mode .review-title:hover {
 }
 
 body.dark-mode .review-content blockquote {
-    background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.12), rgba(15, 23, 32, 0.9));
-    border-color: rgba(var(--accent-rgb), 0.32);
-    color: var(--text);
-    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.35);
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid #223142;
+    color: var(--muted);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
 }
 
 .review-content blockquote>* {
