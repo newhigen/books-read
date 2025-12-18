@@ -1,6 +1,6 @@
 ---
 title: 실패를 생각하지 않는 연습
-date: 2025-12-31
+date: 2025-12-15
 categories: 책
 author: 김미선
 permalink: forget-failing
